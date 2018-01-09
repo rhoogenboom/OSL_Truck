@@ -1,13 +1,21 @@
  /*
- * Open Source Lights   An Arduino-based program to control LED lights on RC vehicles. 
- * Version:             2.10
- * Last Updated:        6/05/2017
- * Copyright 2011       Luke Middleton
+ * Open Source Lights - Truck  
+ * An Arduino-based program to control LED lights and servos on RC utility vehicles. 
+ * Last Updated:        06/01/2018 - rhoogenboom
+ *  
+ * GitHub Repository OSL_Truck:
+ * https://github.com/rhoogenboom/OSL_Truck
  *
- * For more information, see the RCGroups thread: 
+ *
+ * Version history
+ * 6 Jan 2018 - v1.0 - initial project initialization
+ * 
+ * 
+ *
+ * For more information on OSL, see the RCGroups thread: 
  * http://www.rcgroups.com/forums/showthread.php?t=1539753
  * 
- * GitHub Repository:
+ * GitHub Repository OSL_Original:
  * https://github.com/OSRCL/OSL_Original
  * 
  *
@@ -18,6 +26,8 @@
  * CREDITS!    CREDITS!    CREDITS!
  *----------------------------------------------------------------------------------------------------------------------------------------------------->
  * Several people have contributed code to this project
+ * 
+ *  taken from OSL_Original 2.10 by Luke Middleton
  *
  * Richard & Nick       RCGroups username "Rbhoogenboom" and "NickSegers"
  *                          June 2016 - created an Excel file to simplify the light setups. It will automatically generate the entire AA_LIGHT_SETUP file. 
@@ -41,6 +51,14 @@
  * the Free Software Foundation (http://www.gnu.org/licenses/)
  *
 */
+
+//RHO TODO
+
+// remove backfire light code
+
+// fix check code of ch3 is a multiprop channel
+// fix setup code for multiprop channel
+
 
 
 // ====================================================================================================================================================>
@@ -168,18 +186,20 @@
         int CurrentScheme;                                      // Indicates which scheme is presently selected and active. Number from 1 to NumSchemes. 
                                                                 // Note that the actual schemes are zero-based (0 to NumSchemes-1) but don't worry about that,
                                                                 // the code takes care of it. 
-        #define NumLights                    8                  // The number of light outputs available on the board
-        #define NumStates                    14                 // There are 14 possible states a light can be in: 
-                                                                // - Mode 1, Mode 2, Mode 3, Mode 4, Mode 5 (all from Channel3 switch), 
+        #define NumLights                    13                 // The number of light outputs available on the board
+        #define NumStates                    10                 // There are 10 possible states a light can be by: 
+                                                                // - Set through 1 or more switches on the multiprop channel, 
                                                                 // - Forward, Reverse, Stop, Stop Delay, Brake (from Throttle Channel), 
                                                                 // - Right Turn, Left Turn (from Turn Channel)
                                                                 // - Accelerating - 
                                                                 // - Decelerating - special state that occurs on heavy deceleration (from Throttle Channel)
-        const byte Mode1               =     0;                 // Channel 3 in 1st position
-        const byte Mode2               =     1;                 // Channel 3 in 2nd position
-        const byte Mode3               =     2;                 // Channel 3 in 3rd position
-        const byte Mode4               =     3;                 // Channel 3 in 4th position
-        const byte Mode5               =     4;                 // Channel 3 in 5th position        
+//not for truck
+//        const byte Mode1               =     0;                 // Channel 3 in 1st position
+//        const byte Mode2               =     1;                 // Channel 3 in 2nd position
+//        const byte Mode3               =     2;                 // Channel 3 in 3rd position
+//        const byte Mode4               =     3;                 // Channel 3 in 4th position
+//        const byte Mode5               =     4;                 // Channel 3 in 5th position        
+
         const byte StateFwd            =     5;                 // Moving forward
         const byte StateRev            =     6;                 // Moving backwards
         const byte StateStop           =     7;                 // Stopped
@@ -192,9 +212,9 @@
        
         int ActualDimLevel;                                     // We allow the user to enter a Dim level from 0-255. Actually, we do not want them using numbers 0 or 1. The ActualDimLevel corrects for this.
                                                                 // In practice, it is unlikely a user would want a dim level of 1 anyway, as it would be probably invisible. 
-        int LightPin[NumLights] = {9,10,11,6,5,3,15,16};        // These are the Arduino pins to the 8 lights in order from left to right looking down on the top surface of the board. 
+        int LightPin[NumLights] = {9,10,11,6,5,3,15,16,0,1,7,8,12};        // These are the Arduino pins to the 8 lights in order from left to right looking down on the top surface of the board. 
                                                                 // Note that the six Arduino analog pins can be referred to by numbers 14-19
-        int Dimmable[NumLights] = {1,1,1,1,1,1,0,0};            // This indicates which of these pins are capable of ouputting PWM, in order. PWM-capable pins on the Arduino are 3, 5, 6, 9, 10, 11
+        int Dimmable[NumLights] = {1,1,1,1,1,1,0,0,0,0,0,0,0};            // This indicates which of these pins are capable of ouputting PWM, in order. PWM-capable pins on the Arduino are 3, 5, 6, 9, 10, 11
                                                                 // Dimmable must be true in order for the light to be capable of DIM, FADEOFF, or XENON settings
         int LightSettings[NumLights][NumStates];                // An array to hold the settings for each state for each light. 
         int PriorLightSetting[NumLights][NumStates];            // Sometimes we want to temporarily change the setting for a light. We can store the prior setting here, and revert back to it when the temporary change is over.

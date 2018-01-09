@@ -21,6 +21,7 @@ void GetRxCommands()
     if (SteeringChannelPresent) { TurnCommand = GetTurnCommand(); }
     else                        { TurnCommand = 0;                }    // We set Turn to nothing if not being used
 
+//RHO TODO replace with logic for multiprop
     if (Channel3Present)        { Channel3 = GetChannel3Command();}
     else                        { Channel3 = Pos1;                }    // We set Channel 3 to Position 1 if not being used
 }
@@ -73,7 +74,6 @@ boolean SanityCheck()
 int GetThrottleCommand()
 {
     int ThrottleCommand;
-//    ThrottlePulse = fir_basic(pulseIn(ThrottleChannel_Pin, HIGH, ServoTimeout));
     ThrottlePulse = pulseIn(ThrottleChannel_Pin, HIGH, ServoTimeout);  
     
     
