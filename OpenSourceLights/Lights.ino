@@ -29,20 +29,40 @@ void SetLights(int DriveMode)
     int SaveSetting[NumLights];
     int j;
 
-    // Loop through each light, assign the setting appropriate to its state
-    for (j=0; j<NumLights; j++)
-    {
+    int light;
+    int channelItem;
+    unsigned int channelCount = 0;
+    unsigned int counter = 1;
+
+    // figure out if we need to switch something on by the multi channel
+    for (channelItem=1; channelItem <= 8; channelItem++) {
+       // is this channel switched on 
+       if ( multi_prop[channelItem] >= Channel3PulseCenter + 150) {
+          channelCount = channelCount + counter;
+       }
+       counter = counter << 1;
+    }
+
+        // Loop through each light, assign the setting appropriate to its state
+        for (j=0; j<NumLights; j++)
+        {
+
+        if (LightSettings[j][0] > 0) {
+          // should this light be by any of the current channels which are on?
+          if ((LightSettings[j][0] & channelCount) > 0) {
+              //look like so
+              SaveSetting[j] = ON;
+          } else {
+              //nope, so switch it off, or overrule by drive mode
+              SaveSetting[j] = OFF;
+          }
+        }
+          
         // We will use the temporary variable SaveSetting to assign the setting for this light. 
         // A light could have multiple settings apply at one time, be we can only set it to one thing.
         // Therefore each setting is ranked by importance. If multiple settings apply to a light, 
         // the setting applied LAST will be the one used (each check can overwrite the prior one). 
         // You can re-order the checks below, the least important should come first, and most important last.
-
-
-        // Least important - does this light have a setting related to Channel 3? 
-        // --------------------------------------------------------------------------------------------------->>
-        SaveSetting[j] = LightSettings[j][Channel3];
-
 
         // Next - does this light have a setting related to Drive Mode? (Forward, reverse, stop)
         // --------------------------------------------------------------------------------------------------->>

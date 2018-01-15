@@ -178,6 +178,7 @@
         volatile unsigned long MultiPropItemTime= 0;
         volatile unsigned long multiPropStartTime = 0;
         volatile int multi_prop[9];
+        int MultipropChannelPulse[9];
         volatile int current_multiprop_channel = 0;        
 
     
@@ -200,15 +201,15 @@
 //        const byte Mode4               =     3;                 // Channel 3 in 4th position
 //        const byte Mode5               =     4;                 // Channel 3 in 5th position        
 
-        const byte StateFwd            =     5;                 // Moving forward
-        const byte StateRev            =     6;                 // Moving backwards
-        const byte StateStop           =     7;                 // Stopped
-        const byte StateStopDelay      =     8;                 // Stopped for a user-defined length of time
-        const byte StateBrake          =     9;                 // Braking
-        const byte StateRT             =     10;                // Right turn
-        const byte StateLT             =     11;                // Left turn
-        const byte StateAccel          =     12;                // Acceleration
-        const byte StateDecel          =     13;                // Deceleration
+        const byte StateFwd            =    1; //5;                 // Moving forward
+        const byte StateRev            =    2; //6;                 // Moving backwards
+        const byte StateStop           =    3; //7;                 // Stopped
+        const byte StateStopDelay      =    4; //8;                 // Stopped for a user-defined length of time
+        const byte StateBrake          =    5; //9;                 // Braking
+        const byte StateRT             =    6; //10;                // Right turn
+        const byte StateLT             =    7; //11;                // Left turn
+        const byte StateAccel          =    8; //12;                // Acceleration
+        const byte StateDecel          =    9; //13;                // Deceleration
        
         int ActualDimLevel;                                     // We allow the user to enter a Dim level from 0-255. Actually, we do not want them using numbers 0 or 1. The ActualDimLevel corrects for this.
                                                                 // In practice, it is unlikely a user would want a dim level of 1 anyway, as it would be probably invisible. 
@@ -305,7 +306,7 @@ void setup()
 {
     // SERIAL
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
-        Serial.begin(BaudRate);  
+      //  Serial.begin(BaudRate);  
 
     // PINS
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
@@ -917,12 +918,12 @@ void DumpDebug()
     PrintSpaceDash();
     Serial.println(TurnPulseMax);
 
-    Serial.print(F("Ch3 "));
-    Serial.print(Channel3PulseMin);
-    PrintSpaceDash();
-    Serial.print(Channel3PulseCenter);
-    PrintSpaceDash();
-    Serial.println(Channel3PulseMax);
+    // Serial.print(F("Ch3 "));
+    // Serial.print(Channel3PulseMin);
+    // PrintSpaceDash();
+    // Serial.print(Channel3PulseCenter);
+    // PrintSpaceDash();
+    // Serial.println(Channel3PulseMax);
 
 
     // Channel Reversing

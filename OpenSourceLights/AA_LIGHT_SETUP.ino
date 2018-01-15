@@ -71,42 +71,25 @@
     const PROGMEM uint16_t Schemes[NumSchemes][NumLights][NumStates] =
     {
         {
-        //                                     IF CHANNEL 3 is only 3-position switch, values in Pos2 and Pos4 will be ignored (just use Pos1, Pos3, Pos5)
         //     SCHEME ONE - EXAMPLE PROVIDED
         //     Pos 1      Pos 2      Pos 3      Pos 4       Pos 5     Forward     Reverse     Stop      StopDelay   Brake     Right Turn     Left Turn      Accelerating   Decelerating
         // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-{OFF,OFF,OFF,OFF,XENON,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 1 - Headlight 1
-{NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 2 - Headlight 2
-{NA,NA,NA,NA,NA,OFF,OFF,ON,OFF,ON,NA,NA,NA,ON},  // light 3 - Brake
-{NA,NA,NA,NA,NA,NA,BLINK,OFF,BLINK,NA,BLINK,NA,NA,NA},  // light 4 - Right Turn
-{NA,NA,NA,NA,NA,NA,BLINK,OFF,BLINK,NA,NA,BLINK,NA,NA},  // light 5 - Left Turn
-{NA,NA,NA,NA,NA,OFF,ON,OFF,OFF,NA,NA,NA,NA,NA}, // light 6 - Reverse
-{NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 7 - Muffler
-{NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 8 - Backup
-          
-// Light 1    -- Headlight One - XENON on when Channel 3 is in the middle-to-far position - FASTBLINK on overtaking
-// Light 2    -- Headlight Two - ON when Channel 3 is in the middle-to-far position, fadeoff otherwise
-// Light 3    -- Brake Light - ON when Braking, otherwise DIM if Channel 3 is in the middle-to-far positions
-// Light 4    -- Right Turn Lights - SOFTBLINK when turning Right, otherwise DIM if Channel 3 is in middle-to-far positions
-// Light 5    -- Left Turn Lights - SOFTBLINK when turning Left, otherwise DIM if Channel 3 is in middle-to-far positions
-// Light 6    -- Reverse Lights - only on when moving in Reverse
-// Light 7    -- Muffler Light - special backfire effect when decelerating
-// Light 8    -- Backup hazards - blinks when car is in reverse.
 
-},
-        {
-        //     SCHEME TWO - BLANK
-        //     Pos 1      Pos 2      Pos 3      Pos 4       Pos 5     Forward     Reverse     Stop      StopDelay   Brake     Right Turn     Left Turn      Accelerating   Decelerating
-        // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-            {  OFF,       OFF,       OFF,       OFF,        OFF,       NA,         NA,         NA,       NA,        NA,       NA,            NA,           NA,            NA       },  // Light 1    -- 
-            {  OFF,       OFF,       OFF,       OFF,        OFF,       NA,         NA,         NA,       NA,        NA,       NA,            NA,           NA,            NA       },  // Light 2    -- 
-            {  OFF,       OFF,       OFF,       OFF,        OFF,       NA,         NA,         NA,       NA,        NA,       NA,            NA,           NA,            NA       },  // Light 3    -- 
-            {  OFF,       OFF,       OFF,       OFF,        OFF,       NA,         NA,         NA,       NA,        NA,       NA,            NA,           NA,            NA       },  // Light 4    -- 
-            {  OFF,       OFF,       OFF,       OFF,        OFF,       NA,         NA,         NA,       NA,        NA,       NA,            NA,           NA,            NA       },  // Light 5    --             
-            {  OFF,       OFF,       OFF,       OFF,        OFF,       NA,         NA,         NA,       NA,        NA,       NA,            NA,           NA,            NA       },  // Light 6    -- 
-            {  OFF,       OFF,       OFF,       OFF,        OFF,       NA,         NA,         NA,       NA,        NA,       NA,            NA,           NA,            NA       },  // Light 7    -- 
-            {  OFF,       OFF,       OFF,       OFF,        OFF,       NA,         NA,         NA,       NA,        NA,       NA,            NA,           NA,            NA       }   // Light 8    --
-        },
+{0,OFF,OFF,ON,OFF,ON,NA,NA,NA,ON},  // light 1 - Brake  // light 1  D9  9
+{0,NA,BLINK,OFF,BLINK,NA,BLINK,NA,NA,NA}, // light 2 - Right Turn // light 2  D10 10
+{0,NA,BLINK,OFF,BLINK,NA,NA,BLINK,NA,NA}, // light 3 - Left Turn  // light 3  D11 11
+{0,OFF,ON,OFF,OFF,NA,NA,NA,NA,NA},  // light 4 - Reverse  // light 4  D6  6
+{128,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 5 - Headlight 1  // light 5  D5  5
+{64,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 6 - Headlight 2  // light 6  D3  3
+{32,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 7 - Low Fog Front  // light 7  A1  15
+{16,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 8 - High Fog Front // light 8  A2  16
+{8,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 9 - Rear Fog // light 9  D0  0
+{4,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 10 - Emergency // light 10 D1  1
+{2,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 11 - Emergency Trailer // light 11 D7  7
+{1,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 12 - Extra lights 1  // light 12 D8  8
+{1,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 13 - Extra lights 2  // light 13 D12 12
+
+}
     };
 
 

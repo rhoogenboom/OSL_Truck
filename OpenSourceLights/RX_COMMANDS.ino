@@ -22,8 +22,8 @@ void GetRxCommands()
     else                        { TurnCommand = 0;                }    // We set Turn to nothing if not being used
 
 //RHO TODO replace with logic for multiprop
-    if (Channel3Present)        { Channel3 = GetChannel3Command();}
-    else                        { Channel3 = Pos1;                }    // We set Channel 3 to Position 1 if not being used
+    // if (Channel3Present)        { Channel3 = GetChannel3Command();}
+    // else                        { Channel3 = Pos1;                }    // We set Channel 3 to Position 1 if not being used
 }
 
 boolean CheckChannel3()
@@ -169,53 +169,53 @@ int TurnCommand;
 
 
 
-int GetChannel3Command()
-{
-    int Channel3Command;
-        //Channel3Pulse = pulseIn(Channel3_Pin, HIGH, ServoTimeout);
-        // Use channel b of the multiprop to set channel 3 receiver 
-        Channel3Pulse = multi_prop[1];
-        if (Channel3Pulse == 0)
-        {   // In this case, there was no signal found
-            // Channel3Present = false;
-            Channel3Command = Pos1;    // If no Channel3, we always set the mode to 1
-        }
-        else 
-        {
-            // Turn pulse into one of five possible positions
-            if (Channel3Pulse >= Channel3PulseMax - 150)
-            {    
-                Channel3Command = Pos5;
-            }
-            else if ((Channel3Pulse >  (Channel3PulseCenter + 100)) && (Channel3Pulse < (Channel3PulseMax - 150)))
-            {
-                Channel3Command = Pos4;
-            }
-            else if ((Channel3Pulse >= (Channel3PulseCenter - 100)) && (Channel3Pulse <= (Channel3PulseCenter + 100)))
-            {
-                Channel3Command = Pos3;
-            }
-            else if ((Channel3Pulse <  (Channel3PulseCenter - 100)) && (Channel3Pulse > (Channel3PulseMin + 150)))
-            {
-                Channel3Command = Pos2;
-            }
-            else 
-            {
-                Channel3Command = Pos1;
-            }
+// int GetChannel3Command()
+// {
+//     int Channel3Command;
+//         //Channel3Pulse = pulseIn(Channel3_Pin, HIGH, ServoTimeout);
+//         // Use channel b of the multiprop to set channel 3 receiver 
+//         Channel3Pulse = multi_prop[1];
+//         if (Channel3Pulse == 0)
+//         {   // In this case, there was no signal found
+//             // Channel3Present = false;
+//             Channel3Command = Pos1;    // If no Channel3, we always set the mode to 1
+//         }
+//         else 
+//         {
+//             // Turn pulse into one of five possible positions
+//             if (Channel3Pulse >= Channel3PulseMax - 150)
+//             {    
+//                 Channel3Command = Pos5;
+//             }
+//             else if ((Channel3Pulse >  (Channel3PulseCenter + 100)) && (Channel3Pulse < (Channel3PulseMax - 150)))
+//             {
+//                 Channel3Command = Pos4;
+//             }
+//             else if ((Channel3Pulse >= (Channel3PulseCenter - 100)) && (Channel3Pulse <= (Channel3PulseCenter + 100)))
+//             {
+//                 Channel3Command = Pos3;
+//             }
+//             else if ((Channel3Pulse <  (Channel3PulseCenter - 100)) && (Channel3Pulse > (Channel3PulseMin + 150)))
+//             {
+//                 Channel3Command = Pos2;
+//             }
+//             else 
+//             {
+//                 Channel3Command = Pos1;
+//             }
 
-            // Swap positions if Channel 3 is reversed. 
-            if (Channel3Reverse)
-            {
-                if      (Channel3Command == Pos1) Channel3Command = Pos5;
-                else if (Channel3Command == Pos2) Channel3Command = Pos4;
-                else if (Channel3Command == Pos4) Channel3Command = Pos2;
-                else if (Channel3Command == Pos1) Channel3Command = Pos1;
-            }
+//             // Swap positions if Channel 3 is reversed. 
+//             if (Channel3Reverse)
+//             {
+//                 if      (Channel3Command == Pos1) Channel3Command = Pos5;
+//                 else if (Channel3Command == Pos2) Channel3Command = Pos4;
+//                 else if (Channel3Command == Pos4) Channel3Command = Pos2;
+//                 else if (Channel3Command == Pos1) Channel3Command = Pos1;
+//             }
     
-        }
-    return Channel3Command;
-}
+//         }
+//     return Channel3Command;
+// }
 
 void calcMultiPropChannels()
 {
@@ -226,17 +226,17 @@ void calcMultiPropChannels()
   else
   {
     MultiPropItemTime = (uint16_t)(micros() - multiPropStartTime);
-    current_multiprop_channel--;
+    current_multiprop_channel++;
     
     if (MultiPropItemTime < 1000) {
-      current_multiprop_channel = 8;
+      current_multiprop_channel = 0;
     }
 
     if (MultiPropItemTime > 2000) {
-      current_multiprop_channel = 8;
+      current_multiprop_channel = 0;
     }
     
-    if (current_multiprop_channel >= 0) {
+    if (current_multiprop_channel < 10) {
 //      Serial.print(current_multiprop_channel);
 //      Serial.print("\t\t");
 //      Serial.println(MultiPropItemTime);
