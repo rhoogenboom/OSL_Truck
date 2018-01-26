@@ -53,7 +53,6 @@
 */
 
 //RHO TODO
-
 // remove backfire light code
 
 // fix check code of ch3 is a multiprop channel
@@ -73,6 +72,10 @@
     #include <avr/pgmspace.h>
     #include <PinChangeInterrupt.h>
 
+    #include <OSLController.h>
+    #include <SPI.h>
+    #include <nRF24L01.h>
+    #include <RF24.h>
 
    
 // ====================================================================================================================================================>
@@ -187,7 +190,7 @@
         int CurrentScheme;                                      // Indicates which scheme is presently selected and active. Number from 1 to NumSchemes. 
                                                                 // Note that the actual schemes are zero-based (0 to NumSchemes-1) but don't worry about that,
                                                                 // the code takes care of it. 
-        #define NumLights                    13                 // The number of light outputs available on the board
+        #define NumLights                    9                 // The number of light outputs available on the board
         #define NumStates                    10                 // There are 10 possible states a light can be by: 
                                                                 // - Set through 1 or more switches on the multiprop channel, 
                                                                 // - Forward, Reverse, Stop, Stop Delay, Brake (from Throttle Channel), 
@@ -213,9 +216,10 @@
        
         int ActualDimLevel;                                     // We allow the user to enter a Dim level from 0-255. Actually, we do not want them using numbers 0 or 1. The ActualDimLevel corrects for this.
                                                                 // In practice, it is unlikely a user would want a dim level of 1 anyway, as it would be probably invisible. 
-        int LightPin[NumLights] = {9,10,11,6,5,3,15,16,0,1,7,8,12};        // These are the Arduino pins to the 8 lights in order from left to right looking down on the top surface of the board. 
+        int LightPin[NumLights] = {9,10,6,5,3,15,16,0,1};  //WIFI      // These are the Arduino pins to the 8 lights in order from left to right looking down on the top surface of the board. 
+//        int LightPin[NumLights] = {9,10,11,6,5,3,15,16,0,1,7,8,12};        // These are the Arduino pins to the 8 lights in order from left to right looking down on the top surface of the board. 
                                                                 // Note that the six Arduino analog pins can be referred to by numbers 14-19
-        int Dimmable[NumLights] = {1,1,1,1,1,1,0,0,0,0,0,0,0};            // This indicates which of these pins are capable of ouputting PWM, in order. PWM-capable pins on the Arduino are 3, 5, 6, 9, 10, 11
+        int Dimmable[NumLights] = {1,1,1,1,1,0,0,0,0};            // This indicates which of these pins are capable of ouputting PWM, in order. PWM-capable pins on the Arduino are 3, 5, 6, 9, 10, 11
                                                                 // Dimmable must be true in order for the light to be capable of DIM, FADEOFF, or XENON settings
         int LightSettings[NumLights][NumStates];                // An array to hold the settings for each state for each light. 
         int PriorLightSetting[NumLights][NumStates];            // Sometimes we want to temporarily change the setting for a light. We can store the prior setting here, and revert back to it when the temporary change is over.
@@ -296,8 +300,12 @@
           int E_CurrentScheme;
         };
 
+    // WIFI
+    // ------------------------------------------------------------------------------------------------------------------------------------------------>
+        RF24 radio(7, 8); // CE, CSN
+        const byte address[6] = {0x66,0x68,0x7b,0x4a,0x63};   
 
-
+        OSLController controller();
 
 // ====================================================================================================================================================>
 //  SETUP
@@ -307,6 +315,13 @@ void setup()
     // SERIAL
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
       //  Serial.begin(BaudRate);  
+
+    //WIFI
+        radio.begin();
+        radio.openWritingPipe(address);
+        radio.setPALevel(RF24_PA_MIN);
+        radio.stopListening();
+
 
     // PINS
     // ------------------------------------------------------------------------------------------------------------------------------------------------>

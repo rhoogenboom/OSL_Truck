@@ -84,10 +84,10 @@
 {32,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 7 - Low Fog Front  // light 7  A1  15
 {16,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 8 - High Fog Front // light 8  A2  16
 {8,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 9 - Rear Fog // light 9  D0  0
-{4,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 10 - Emergency // light 10 D1  1
-{2,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 11 - Emergency Trailer // light 11 D7  7
-{1,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 12 - Extra lights 1  // light 12 D8  8
-{1,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 13 - Extra lights 2  // light 13 D12 12
+//{4,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 10 - Emergency // light 10 D1  1
+//{2,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 11 - Emergency Trailer // light 11 D7  7
+//{1,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 12 - Extra lights 1  // light 12 D8  8
+//{1,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 13 - Extra lights 2  // light 13 D12 12
 
 }
     };

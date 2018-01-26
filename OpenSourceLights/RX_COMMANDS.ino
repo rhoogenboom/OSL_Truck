@@ -75,7 +75,7 @@ int GetThrottleCommand()
 {
     int ThrottleCommand;
     ThrottlePulse = pulseIn(ThrottleChannel_Pin, HIGH, ServoTimeout);  
-    
+    controller.setController1(ThrottlePulse);
     
     if ((ThrottlePulse == 0) || (ThrottlePulse > PulseMax_Bad) || (ThrottlePulse < PulseMin_Bad))
     {   // Timed out waiting for a signal, or measured a bad signal
@@ -126,6 +126,7 @@ int GetTurnCommand()
 {
 int TurnCommand;
     TurnPulse = pulseIn(SteeringChannel_Pin, HIGH, ServoTimeout);
+    controller.setController2(TurnPulse);
     if ((TurnPulse == 0) || (TurnPulse > PulseMax_Bad) || (TurnPulse < PulseMin_Bad))
     {   // In this case, there was no signal found on the turn channel
         TurnCommand = 0;    // If no TurnPulse, we set Turn to 0 (no turn)
