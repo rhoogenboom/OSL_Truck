@@ -81,6 +81,23 @@
 // ====================================================================================================================================================>
 //  GLOBAL VARIABLES
 // ====================================================================================================================================================>
+    // PINs
+        //receiver items and model inputs
+        const byte ThrottleChannel_Pin =    21;                      // The Arduino pin connected to the throttle channel input - D21/pin43
+        const byte SteeringChannel_Pin =    20;                      // The Arduino pin connected to the steering channel input - D20/pin44
+        const byte Channel3_Pin        =    19;                      // The Arduino pin connected to the multichannel input - D19/pin45
+        const byte MixSteeringChannel_Pin = 18;                      // The Arduino pin connected to the steering channel for mixing the rear axles - D18/pin46
+        const byte PotMeter            =    A1;                      // The Arduino pin connected to the potentio-meter from the 5th wheel A1/pin96
+
+        //OSL board items
+        const byte GreenLED            =    A4;                      // The Arduino pin connected to the on-board Green LED A4/pin93
+        const byte RedLED              =    A5;                      // The Arduino pin connected to the on-board Red LED A5/pin92 
+        const byte SetupButton         =    A0;                      // The Arduino pin connected to the on-board push button A0/pin97 
+
+        const byte NFR_CSN             =    4;                       // The Arduino pin connected to the NFR CSN pin D4/pin1
+        const byte NFR_CE              =    3;                       // The Arduino pin connected to the NFR CE pin D3/pin7
+        
+
     // Useful names 
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
         const int NA                   =    -1;                 // For each of the 8 states the light can have the following settings: On, Off, NA, Blink, FastBlink, or Dim. On/Off are defined below
@@ -132,10 +149,12 @@
             return Names[Type];
         };
 
+        //RC channel variables 
+        volatile unsigned long receiver_pulse_start[3];                // Array to keep track of 3 timer values for calculating the pulse width of a receiver channel
 
         // Throttle
         int ThrottleCommand            =     0;                 // A mapped value of ThrottlePulse to (0, MapPulseFwd/Rev) where MapPulseFwd/Rev is the maximum FWD/REV speed (100, or less if governed)
-        int ThrottlePulse;                                      // Positive = Forward, Negative = Reverse <ThrottlePulseCenter - ThrottlePulseMin> to <0> to <ThrottlePulseCenter + ThrottlePulseMax>
+        volatile int ThrottlePulse;                             // Positive = Forward, Negative = Reverse <ThrottlePulseCenter - ThrottlePulseMin> to <0> to <ThrottlePulseCenter + ThrottlePulseMax>
         int ThrottlePulseMin;                                   // Will ultimately be determined by setup procedure to read max travel on stick, or from EEPROM if setup complete
         int ThrottlePulseMax;                                   // Will ultimately be determined by setup procedure to read max travel on stick, or from EEPROM if setup complete
         int ThrottlePulseCenter;                                // EX: 1000 + ((2000-1000)/2) = 1500. If Pulse = 1000 then -500, 1500 = 0, 2000 = 500
@@ -147,7 +166,7 @@
         // Steering
         boolean SteeringChannelPresent;                         // On startup we check to see if this channel is connected, if not, this variable gets set to False and we don't bother checking for it again until reboot
         int TurnCommand                =     0;                 // A mapped value of ThrottlePulse from (TurnPulseMin/TurnPulseMax) to MaxLeft/MaxRight turn (100 each way, or less if governed)
-        int TurnPulse;                                          // Positive = Right, Negative = Left <TurnPulseCenter - TurnPulseMin> to <0> to <TurnPulseCenter + TurnPulseMax>
+        volatile int TurnPulse;                                 // Positive = Right, Negative = Left <TurnPulseCenter - TurnPulseMin> to <0> to <TurnPulseCenter + TurnPulseMax>
         int TurnPulseMin;                                       // Will ultimately be determined by setup procedure to read max travel on stick, or from EEPROM if setup complete
         int TurnPulseMax;                                       // Will ultimately be determined by setup procedure to read max travel on stick, or from EEPROM if setup complete
         int TurnPulseCenter;                                    // EX: 1000 + ((2000-1000)/2) = 1500. If Pulse = 1000 then -500, 1500 = 0, 2000 = 500
@@ -190,19 +209,13 @@
         int CurrentScheme;                                      // Indicates which scheme is presently selected and active. Number from 1 to NumSchemes. 
                                                                 // Note that the actual schemes are zero-based (0 to NumSchemes-1) but don't worry about that,
                                                                 // the code takes care of it. 
-        #define NumLights                    9                 // The number of light outputs available on the board
+        #define NumLights                    12                 // The number of light outputs available on the board
         #define NumStates                    10                 // There are 10 possible states a light can be by: 
                                                                 // - Set through 1 or more switches on the multiprop channel, 
                                                                 // - Forward, Reverse, Stop, Stop Delay, Brake (from Throttle Channel), 
                                                                 // - Right Turn, Left Turn (from Turn Channel)
                                                                 // - Accelerating - 
                                                                 // - Decelerating - special state that occurs on heavy deceleration (from Throttle Channel)
-//not for truck
-//        const byte Mode1               =     0;                 // Channel 3 in 1st position
-//        const byte Mode2               =     1;                 // Channel 3 in 2nd position
-//        const byte Mode3               =     2;                 // Channel 3 in 3rd position
-//        const byte Mode4               =     3;                 // Channel 3 in 4th position
-//        const byte Mode5               =     4;                 // Channel 3 in 5th position        
 
         const byte StateFwd            =    1; //5;                 // Moving forward
         const byte StateRev            =    2; //6;                 // Moving backwards
@@ -214,24 +227,23 @@
         const byte StateAccel          =    8; //12;                // Acceleration
         const byte StateDecel          =    9; //13;                // Deceleration
        
-        int ActualDimLevel;                                     // We allow the user to enter a Dim level from 0-255. Actually, we do not want them using numbers 0 or 1. The ActualDimLevel corrects for this.
-                                                                // In practice, it is unlikely a user would want a dim level of 1 anyway, as it would be probably invisible. 
-        int LightPin[NumLights] = {9,10,6,5,3,15,16,0,1};  //WIFI      // These are the Arduino pins to the 8 lights in order from left to right looking down on the top surface of the board. 
-//        int LightPin[NumLights] = {9,10,11,6,5,3,15,16,0,1,7,8,12};        // These are the Arduino pins to the 8 lights in order from left to right looking down on the top surface of the board. 
-                                                                // Note that the six Arduino analog pins can be referred to by numbers 14-19
-        int Dimmable[NumLights] = {1,1,1,1,1,0,0,0,0};            // This indicates which of these pins are capable of ouputting PWM, in order. PWM-capable pins on the Arduino are 3, 5, 6, 9, 10, 11
-                                                                // Dimmable must be true in order for the light to be capable of DIM, FADEOFF, or XENON settings
-        int LightSettings[NumLights][NumStates];                // An array to hold the settings for each state for each light. 
-        int PriorLightSetting[NumLights][NumStates];            // Sometimes we want to temporarily change the setting for a light. We can store the prior setting here, and revert back to it when the temporary change is over.
-        int PWM_Step[NumLights] = {0,0,0,0,0,0,0,0};            // What is the current PWM value of each light. 
+        int ActualDimLevel;                                             // We allow the user to enter a Dim level from 0-255. Actually, we do not want them using numbers 0 or 1. The ActualDimLevel corrects for this.
+                                                                        // In practice, it is unlikely a user would want a dim level of 1 anyway, as it would be probably invisible. 
+        int LightPin[NumLights] = {9,10,11,6,7,8,12,13,46,5,17,45};       // These are the Arduino pins to the 8 lights  
+                                                                
+        int Dimmable[NumLights] = {1,1,1,1,1,1,1,1,1,1,1,1};            // This indicates which of these pins are capable of ouputting PWM, in order. 
+                                                                        // Dimmable must be true in order for the light to be capable of DIM, FADEOFF, or XENON settings
+        int LightSettings[NumLights][NumStates];                        // An array to hold the settings for each state for each light. 
+        int PriorLightSetting[NumLights][NumStates];                    // Sometimes we want to temporarily change the setting for a light. We can store the prior setting here, and revert back to it when the temporary change is over.
+        int PWM_Step[NumLights] = {0,0,0,0,0,0,0,0,0,0,0,0};            // What is the current PWM value of each light. 
 
         // FadeOff effect
-        int FadeOff_EffectDone[NumLights] = {0,0,0,0,0,0,0,0};  // For each light, if = 1, then the Fade  effect is done, don't do it again until cleared (Fade_EffectDone = 0)
+        int FadeOff_EffectDone[NumLights] = {0,0,0,0,0,0,0,0,0,0,0,0};  // For each light, if = 1, then the Fade  effect is done, don't do it again until cleared (Fade_EffectDone = 0)
 
         // Xenon effect
-        int Xenon_EffectDone[NumLights] = {0,0,0,0,0,0,0,0};    // For each light, if = 1, then the Xenon effect is done, don't do it again until cleared (Xenon_EffectDone = 0)
-        int Xenon_Step[NumLights]       = {0,0,0,0,0,0,0,0};    // Save the current step variable for the Xenon light effect
-        unsigned long Xenon_millis[NumLights] = {0,0,0,0,0,0,0,0};
+        int Xenon_EffectDone[NumLights] = {0,0,0,0,0,0,0,0,0,0,0,0};    // For each light, if = 1, then the Xenon effect is done, don't do it again until cleared (Xenon_EffectDone = 0)
+        int Xenon_Step[NumLights]       = {0,0,0,0,0,0,0,0,0,0,0,0};    // Save the current step variable for the Xenon light effect
+        unsigned long Xenon_millis[NumLights] = {0,0,0,0,0,0,0,0,0,0,0,0};
         unsigned long Xenon_interval    = 25;                   // The interval between the various step of the Xenon effect
 
         // Backfire effect
@@ -246,14 +258,10 @@
         // Blinking effect
         boolean Blinker                =  true;                 // A flip/flop variable used for blinking
         boolean FastBlinker            =  true;                 // A flip/flop variable used for fast blinking
-        boolean IndividualLightBlinker[NumLights] = {true, true, true, true, true, true, true, true};   // A flip/flop variable but this time one for each light. Used for SoftBlink.
-
+        boolean IndividualLightBlinker[NumLights] = {true, true, true, true, true, true, true, true, true, true, true, true};   // A flip/flop variable but this time one for each light. Used for SoftBlink.
 
     // RC CHANNEL INPUTS
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
-        const byte ThrottleChannel_Pin =     4;                 // The Arduino pin connected to the throttle channel input
-        const byte SteeringChannel_Pin =    17;                 // The Arduino pin connected to the steering channel input (this is the same as saying pin A3)
-        const byte Channel3_Pin        =     2;                 // The Arduino pin connected to the Channel 3 input
         boolean Failsafe               = false;                 // If we loose contact with the Rx this flag becomes True
         unsigned long ServoTimeout     = 35000;                 // Value in microseconds (uS) - length of time to wait for a servo pulse. Measured on Eurgle/HK 3channel at ~20-22ms between pulses
                                                                 // Up to version 2.03 of OSL code this value was 21,000 (21ms) and it worked fine. However with the release of Arduino IDE 1.6.5, 
@@ -264,9 +272,6 @@
  
     // BOARD OBJECTS
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
-        const byte GreenLED            =    18;                 // The Arduino pin connected to the on-board Green LED (this is the same as saying pin A4)
-        const byte RedLED              =    19;                 // The Arduino pin connected to the on-board Red LED (this is the same as saying pin A5) 
-        const byte SetupButton         =    14;                 // The Arduino pin connected to the on-board push button (this is the same as saying pin A0) 
         // Button Object
         OSL_Button InputButton = OSL_Button(SetupButton, true, true, 25);   // Initialize a button object. Set pin, internal pullup = true, inverted = true, debounce time = 25 mS
 
@@ -302,10 +307,20 @@
 
     // WIFI
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
-        RF24 radio(7, 8); // CE, CSN
+        RF24 radio(NFR_CE, NFR_CSN); // NFR CE, CSN connections
+        //NFR pin connections:
+        //Arduino
+        //Pin   Pin Name            Mapped Pin Name       Connected To  Device
+        //1     PG5 ( OC0B )        Digital pin 4 (PWM)   CSN           NFR
+        //7     PE5 ( OC3C/INT5 )   Digital pin 3 (PWM)   CE            NFR
+        //11    GND GND GND NFR
+        //20    PB1 ( SCK/PCINT1 )  Digital pin 52 (SCK)  SCK           NFR
+        //21    PB2 ( MOSI/PCINT2 ) Digital pin 51 (MOSI) MOSI          NFR
+        //22    PB3 ( MISO/PCINT3 ) Digital pin 50 (MISO) MISO          NFR
         const byte address[6] = {0x66,0x68,0x7b,0x4a,0x63};   
 
-        OSLController controller();
+        OSLController controller;         // Wrapper object around 3 RC channels, drive mode and 8 light switches
+
 
 // ====================================================================================================================================================>
 //  SETUP
@@ -314,14 +329,13 @@ void setup()
 {
     // SERIAL
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
-      //  Serial.begin(BaudRate);  
+       Serial.begin(BaudRate);  
 
     //WIFI
         radio.begin();
         radio.openWritingPipe(address);
         radio.setPALevel(RF24_PA_MIN);
         radio.stopListening();
-
 
     // PINS
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
@@ -335,13 +349,23 @@ void setup()
             pinMode(LightPin[i], OUTPUT);                       // Set all the external light pins to outputs
             TurnOffLight(i);                                    // Start with all lights off                        
         }
-    
-        pinMode(ThrottleChannel_Pin, INPUT_PULLUP);             // Set these pins to input, with internal pullup resistors enabled
-        pinMode(SteeringChannel_Pin, INPUT_PULLUP);
-        
-        //pinMode(Channel3_Pin, INPUT_PULLUP);
-        // attach interrupt handler function to channel 3 pin
-        attachInterrupt(digitalPinToInterrupt(Channel3_Pin), calcMultiPropChannels, CHANGE); 
+
+        // Timer values for receiver channels
+        for (int i=0;i<3;i++) {
+          receiver_pulse_start[i] = 0;
+        }
+
+        // Set these pins to input
+        pinMode(ThrottleChannel_Pin, INPUT);             
+        pinMode(SteeringChannel_Pin, INPUT);
+        pinMode(Channel3_Pin, INPUT);
+        pinMode(MixSteeringChannel_Pin, INPUT);
+
+        // Hook up interrupt handler functions for when data comes in
+        attachInterrupt(digitalPinToInterrupt(ThrottleChannel_Pin), calcChannel1, CHANGE);
+        attachInterrupt(digitalPinToInterrupt(SteeringChannel_Pin), calcChannel2, CHANGE);
+        attachInterrupt(digitalPinToInterrupt(Channel3_Pin), calcMultiPropChannel, CHANGE);
+        attachInterrupt(digitalPinToInterrupt(MixSteeringChannel_Pin), calcChannel4, CHANGE);
 
         pinMode(SetupButton, INPUT_PULLUP);    
 
@@ -349,8 +373,8 @@ void setup()
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
         Failsafe = true;                                        // Set failsafe to true
         GetRxCommands();                                        // If a throttle signal is measured, Failsafe will turn off
-        SteeringChannelPresent = CheckSteeringChannel();        // Check for the presence of a steering channel. If we don't find it here, we won't be checking for it again until the board is rebooted
-        Channel3Present = CheckChannel3();                      // Check for the presence of Channel 3. If we don't find it here, we won't be checking for it again until the board is rebooted
+        SteeringChannelPresent = true; //CheckSteeringChannel();        // Check for the presence of a steering channel. If we don't find it here, we won't be checking for it again until the board is rebooted
+        //Channel3Present = CheckChannel3();                      // Check for the presence of Channel 3. If we don't find it here, we won't be checking for it again until the board is rebooted
 
             
     // LOAD VALUES FROM EEPROM    
@@ -374,7 +398,6 @@ void setup()
         randomSeed(analogRead(0));
         backfire_interval = random(BF_Short, BF_Long);
         backfire_timeout  = BF_Time + random(BF_Short, BF_Long);
-
 }
 
 
@@ -843,7 +866,8 @@ void loop()
         }
 
     // WE NOW HAVE OUR ACTUAL DRIVE MODE - SET THE LIGHTS ACCORDINGLY
-    // ------------------------------------------------------------------------------------------------------------------------------------------------>    
+    // ------------------------------------------------------------------------------------------------------------------------------------------------> 
+        controller.setDriveMode(DriveMode);   
         SetLights(DriveMode);        // SetLights will take into account whatever position Channel 3 is in, as well as the present drive mode
 
 
@@ -907,6 +931,10 @@ void loop()
         DriveModeCommand_Previous = DriveModeCommand;
         ThrottleCommand_Previous = ThrottleCommand;
 
+    // NFR
+    // ------------------------------------------------------------------------------------------------------------------------------------------------
+        // send state over wifi
+        transmitControllerInfo();
 
 } // End of Loop
 

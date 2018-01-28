@@ -5,9 +5,6 @@ void GetRxCommands()
     // We always check the Throttle channel
     ThrottleCommand = GetThrottleCommand();
 
-//    if (SanityCheck()) { LastThrottleCommand = ThrottleCommand;}
-//    else    { ThrottleCommand = LastThrottleCommand; }
-    
     while(Failsafe)
     {
         if (DEBUG) Serial.println(F("RX Disconnected!"));
@@ -18,20 +15,23 @@ void GetRxCommands()
 
     // But to save time, we only check the Steering and Channel 3 channels 
     // if they were detected at startup. Otherwise we ignore them. 
-    if (SteeringChannelPresent) { TurnCommand = GetTurnCommand(); }
-    else                        { TurnCommand = 0;                }    // We set Turn to nothing if not being used
+    if (SteeringChannelPresent) { 
+      TurnCommand = GetTurnCommand(); 
+    } else { 
+      TurnCommand = 0; // We set Turn to nothing if not being used                
+    }    
 
 //RHO TODO replace with logic for multiprop
     // if (Channel3Present)        { Channel3 = GetChannel3Command();}
     // else                        { Channel3 = Pos1;                }    // We set Channel 3 to Position 1 if not being used
 }
 
-boolean CheckChannel3()
-{
-    Channel3Pulse = pulseIn(Channel3_Pin, HIGH, ServoTimeout * 2);
-    if (Channel3Pulse == 0) { return false; }
-    else { return true; }
-}
+//boolean CheckChannel3()
+//{
+//    Channel3Pulse = pulseIn(Channel3_Pin, HIGH, ServoTimeout * 2);
+//    if (Channel3Pulse == 0) { return false; }
+//    else { return true; }
+//}
 
 boolean CheckSteeringChannel()
 {
@@ -74,7 +74,7 @@ boolean SanityCheck()
 int GetThrottleCommand()
 {
     int ThrottleCommand;
-    ThrottlePulse = pulseIn(ThrottleChannel_Pin, HIGH, ServoTimeout);  
+    //ThrottlePulse = pulseIn(ThrottleChannel_Pin, HIGH, ServoTimeout);  
     controller.setController1(ThrottlePulse);
     
     if ((ThrottlePulse == 0) || (ThrottlePulse > PulseMax_Bad) || (ThrottlePulse < PulseMin_Bad))
@@ -124,8 +124,8 @@ int GetThrottleCommand()
 
 int GetTurnCommand()
 {
-int TurnCommand;
-    TurnPulse = pulseIn(SteeringChannel_Pin, HIGH, ServoTimeout);
+    int TurnCommand;
+    //TurnPulse = pulseIn(SteeringChannel_Pin, HIGH, ServoTimeout);
     controller.setController2(TurnPulse);
     if ((TurnPulse == 0) || (TurnPulse > PulseMax_Bad) || (TurnPulse < PulseMin_Bad))
     {   // In this case, there was no signal found on the turn channel
@@ -168,64 +168,43 @@ int TurnCommand;
     }
 }
 
-
-
-// int GetChannel3Command()
-// {
-//     int Channel3Command;
-//         //Channel3Pulse = pulseIn(Channel3_Pin, HIGH, ServoTimeout);
-//         // Use channel b of the multiprop to set channel 3 receiver 
-//         Channel3Pulse = multi_prop[1];
-//         if (Channel3Pulse == 0)
-//         {   // In this case, there was no signal found
-//             // Channel3Present = false;
-//             Channel3Command = Pos1;    // If no Channel3, we always set the mode to 1
-//         }
-//         else 
-//         {
-//             // Turn pulse into one of five possible positions
-//             if (Channel3Pulse >= Channel3PulseMax - 150)
-//             {    
-//                 Channel3Command = Pos5;
-//             }
-//             else if ((Channel3Pulse >  (Channel3PulseCenter + 100)) && (Channel3Pulse < (Channel3PulseMax - 150)))
-//             {
-//                 Channel3Command = Pos4;
-//             }
-//             else if ((Channel3Pulse >= (Channel3PulseCenter - 100)) && (Channel3Pulse <= (Channel3PulseCenter + 100)))
-//             {
-//                 Channel3Command = Pos3;
-//             }
-//             else if ((Channel3Pulse <  (Channel3PulseCenter - 100)) && (Channel3Pulse > (Channel3PulseMin + 150)))
-//             {
-//                 Channel3Command = Pos2;
-//             }
-//             else 
-//             {
-//                 Channel3Command = Pos1;
-//             }
-
-//             // Swap positions if Channel 3 is reversed. 
-//             if (Channel3Reverse)
-//             {
-//                 if      (Channel3Command == Pos1) Channel3Command = Pos5;
-//                 else if (Channel3Command == Pos2) Channel3Command = Pos4;
-//                 else if (Channel3Command == Pos4) Channel3Command = Pos2;
-//                 else if (Channel3Command == Pos1) Channel3Command = Pos1;
-//             }
-    
-//         }
-//     return Channel3Command;
-// }
-
-void calcMultiPropChannels()
-{
-  if (digitalRead(Channel3_Pin) == HIGH)
-  {
-    multiPropStartTime = micros();
+void calcChannel1() {
+  //if the pin has gone HIGH, record the microseconds since the Arduino started up
+  if (digitalRead(ThrottleChannel_Pin) == HIGH) {
+    receiver_pulse_start[0] = micros();
+  } else {
+    //otherwise, the pin has gone LOW
+    //only worry about this if the timer has actually started
+    if (receiver_pulse_start[0] != 0) {
+      //record the pulse time
+      ThrottlePulse = ((volatile int)micros() - receiver_pulse_start[0]);
+      //restart the timer
+      receiver_pulse_start[0] = 0;
+    }
   }
-  else
-  {
+}
+
+void calcChannel2() {
+  //if the pin has gone HIGH, record the microseconds since the Arduino started up
+  if (digitalRead(SteeringChannel_Pin) == HIGH) {
+    receiver_pulse_start[0] = micros();
+  } else {
+    //otherwise, the pin has gone LOW
+    //only worry about this if the timer has actually started
+    if (receiver_pulse_start[0] != 0) {
+      //record the pulse time
+      ThrottlePulse = ((volatile int)micros() - receiver_pulse_start[0]);
+      //restart the timer
+      receiver_pulse_start[0] = 0;
+    }
+  }
+}
+
+void calcMultiPropChannel()
+{
+  if (digitalRead(Channel3_Pin) == HIGH) {
+    multiPropStartTime = micros();
+  } else {
     MultiPropItemTime = (uint16_t)(micros() - multiPropStartTime);
     current_multiprop_channel++;
     
@@ -238,10 +217,24 @@ void calcMultiPropChannels()
     }
     
     if (current_multiprop_channel < 10) {
-//      Serial.print(current_multiprop_channel);
-//      Serial.print("\t\t");
-//      Serial.println(MultiPropItemTime);
       multi_prop[current_multiprop_channel] = MultiPropItemTime;
+    }
+  }
+}
+
+
+void calcChannel4() {
+  //if the pin has gone HIGH, record the microseconds since the Arduino started up
+  if (digitalRead(MixSteeringChannel_Pin) == HIGH) {
+    receiver_pulse_start[0] = micros();
+  } else {
+    //otherwise, the pin has gone LOW
+    //only worry about this if the timer has actually started
+    if (receiver_pulse_start[0] != 0) {
+      //record the pulse time
+      ThrottlePulse = ((volatile int)micros() - receiver_pulse_start[0]);
+      //restart the timer
+      receiver_pulse_start[0] = 0;
     }
   }
 }

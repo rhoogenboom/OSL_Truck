@@ -75,19 +75,18 @@
         //     Pos 1      Pos 2      Pos 3      Pos 4       Pos 5     Forward     Reverse     Stop      StopDelay   Brake     Right Turn     Left Turn      Accelerating   Decelerating
         // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-{0,OFF,OFF,ON,OFF,ON,NA,NA,NA,ON},  // light 1 - Brake  // light 1  D9  9
-{0,NA,BLINK,OFF,BLINK,NA,BLINK,NA,NA,NA}, // light 2 - Right Turn // light 2  D10 10
-{0,NA,BLINK,OFF,BLINK,NA,NA,BLINK,NA,NA}, // light 3 - Left Turn  // light 3  D11 11
-{0,OFF,ON,OFF,OFF,NA,NA,NA,NA,NA},  // light 4 - Reverse  // light 4  D6  6
-{128,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 5 - Headlight 1  // light 5  D5  5
-{64,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 6 - Headlight 2  // light 6  D3  3
-{32,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 7 - Low Fog Front  // light 7  A1  15
-{16,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 8 - High Fog Front // light 8  A2  16
-{8,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 9 - Rear Fog // light 9  D0  0
-//{4,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 10 - Emergency // light 10 D1  1
-//{2,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 11 - Emergency Trailer // light 11 D7  7
-//{1,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 12 - Extra lights 1  // light 12 D8  8
-//{1,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 13 - Extra lights 2  // light 13 D12 12
+{0,OFF,OFF,ON,OFF,ON,NA,NA,NA,ON},  // light 1 - Brake  // light 1
+{0,NA,BLINK,OFF,BLINK,NA,BLINK,NA,NA,NA}, // light 2 - Right Turn // light 2
+{0,NA,BLINK,OFF,BLINK,NA,NA,BLINK,NA,NA}, // light 3 - Left Turn  // light 3
+{0,OFF,ON,OFF,OFF,NA,NA,NA,NA,NA},  // light 4 - Reverse  // light 4
+{128,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 5 - Headlight 1  // light 5
+{64,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 6 - Headlight 2  // light 6
+{32,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 7 - Low Fog Front  // light 7
+{16,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 8 - High Fog Front // light 8
+{8,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 9  - Rear Fog  // light 9 
+{4,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 10  - Emergency  // light 10 
+{2,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 11 - Emergency Trailer // light 11
+{1,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 12 - Extra lights 1  // light 12
 
 }
     };
