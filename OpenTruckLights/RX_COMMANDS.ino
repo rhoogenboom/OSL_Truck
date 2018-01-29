@@ -8,6 +8,7 @@ void GetRxCommands()
     while(Failsafe)
     {
         if (DEBUG) Serial.println(F("RX Disconnected!"));
+        transmitControllerInfo();
         ToggleAllLights();                                       // If the receiver isn't connected, pause the program and flash all the lights
         delay(50);
         GetThrottleCommand();
@@ -21,60 +22,19 @@ void GetRxCommands()
       TurnCommand = 0; // We set Turn to nothing if not being used                
     }    
 
-//RHO TODO replace with logic for multiprop
-    // if (Channel3Present)        { Channel3 = GetChannel3Command();}
-    // else                        { Channel3 = Pos1;                }    // We set Channel 3 to Position 1 if not being used
-}
-
-//boolean CheckChannel3()
-//{
-//    Channel3Pulse = pulseIn(Channel3_Pin, HIGH, ServoTimeout * 2);
-//    if (Channel3Pulse == 0) { return false; }
-//    else { return true; }
-//}
-
-boolean CheckSteeringChannel()
-{
-    TurnPulse = pulseIn(SteeringChannel_Pin, HIGH, ServoTimeout * 2);
-    if (TurnPulse == 0) { return false; }
-    else { return true; }
-}    
-
-
-// This probably isn't needed anymore... was tested to filter out glitching
-#define GoodFrames 3
-boolean SanityCheck()
-{
-    static byte Dir = STOP;
-    static byte LastDir = STOP;
-    static int TCount = 0;
-    
-    if (ThrottleCommand > 0) {Dir = FWD;}
-    if (ThrottleCommand < 0) {Dir = REV;}
-    else {Dir = STOP;}
-    
-    if ((Dir != LastDir) && (TCount < GoodFrames)) 
-    {   TCount += 1; 
-        return false;    
-    }
-    else 
-    {   TCount = 0;
-        LastDir = Dir;
-        return true;
-    }
-    
-    Serial.print(Dir);
-    PrintSpace();
-    Serial.print(LastDir);
-    PrintSpace();
-    Serial.println(TCount);
+    GetMixedSteeringInput(); 
 }
 
 
 int GetThrottleCommand()
 {
     int ThrottleCommand;
-    //ThrottlePulse = pulseIn(ThrottleChannel_Pin, HIGH, ServoTimeout);  
+
+    if (INTERUPT_IO) {
+      ThrottlePulse = pulse_time[RC_Throttle_Index];
+    } else {
+      ThrottlePulse = pulseIn(ThrottleChannel_Pin, HIGH, ServoTimeout);  
+    }
     controller.setController1(ThrottlePulse);
     
     if ((ThrottlePulse == 0) || (ThrottlePulse > PulseMax_Bad) || (ThrottlePulse < PulseMin_Bad))
@@ -122,10 +82,29 @@ int GetThrottleCommand()
     }    
 }
 
+
+int GetMixedSteeringInput()
+{
+    //read the input from the RC receiver overruling the 5th wheel position
+    if (INTERUPT_IO) {
+      MixedTurnPulse = pulse_time[RC_RearAxles_Index];
+    } else {
+      MixedTurnPulse = pulseIn(MixSteeringChannel_Pin, HIGH, ServoTimeout);
+    }
+
+    //update the controller object for sending the data over
+    controller.setController3(CalculateRearAxlePosition(MixedTurnPulse));  
+}  
+
+
 int GetTurnCommand()
 {
     int TurnCommand;
-    //TurnPulse = pulseIn(SteeringChannel_Pin, HIGH, ServoTimeout);
+    if (INTERUPT_IO) {
+      TurnPulse = pulse_time[RC_Steering_Index];
+    } else {
+      TurnPulse = pulseIn(SteeringChannel_Pin, HIGH, ServoTimeout);
+    }
     controller.setController2(TurnPulse);
     if ((TurnPulse == 0) || (TurnPulse > PulseMax_Bad) || (TurnPulse < PulseMin_Bad))
     {   // In this case, there was no signal found on the turn channel
@@ -168,38 +147,6 @@ int GetTurnCommand()
     }
 }
 
-void calcChannel1() {
-  //if the pin has gone HIGH, record the microseconds since the Arduino started up
-  if (digitalRead(ThrottleChannel_Pin) == HIGH) {
-    receiver_pulse_start[0] = micros();
-  } else {
-    //otherwise, the pin has gone LOW
-    //only worry about this if the timer has actually started
-    if (receiver_pulse_start[0] != 0) {
-      //record the pulse time
-      ThrottlePulse = ((volatile int)micros() - receiver_pulse_start[0]);
-      //restart the timer
-      receiver_pulse_start[0] = 0;
-    }
-  }
-}
-
-void calcChannel2() {
-  //if the pin has gone HIGH, record the microseconds since the Arduino started up
-  if (digitalRead(SteeringChannel_Pin) == HIGH) {
-    receiver_pulse_start[0] = micros();
-  } else {
-    //otherwise, the pin has gone LOW
-    //only worry about this if the timer has actually started
-    if (receiver_pulse_start[0] != 0) {
-      //record the pulse time
-      ThrottlePulse = ((volatile int)micros() - receiver_pulse_start[0]);
-      //restart the timer
-      receiver_pulse_start[0] = 0;
-    }
-  }
-}
-
 void calcMultiPropChannel()
 {
   if (digitalRead(Channel3_Pin) == HIGH) {
@@ -222,20 +169,30 @@ void calcMultiPropChannel()
   }
 }
 
+void calcChannel(int channel, int pinNumber) 
+{
+    //if the pin has gone HIGH, record the microseconds since the Arduino started up 
+    if(digitalRead(pinNumber) == HIGH) 
+    { 
+        receiver_pulse_start[channel] = micros();
+    } 
+    //otherwise, the pin has gone LOW 
+    else
+    { 
+        //only worry about this if the timer has actually started
+        if(receiver_pulse_start[channel] != 0)
+        { 
+            //record the pulse time
+            pulse_time[channel] = ((volatile int)micros() - receiver_pulse_start[channel]);
+            //restart the timer
+            receiver_pulse_start[channel] = 0;
+        }
+    } 
+} 
 
-void calcChannel4() {
-  //if the pin has gone HIGH, record the microseconds since the Arduino started up
-  if (digitalRead(MixSteeringChannel_Pin) == HIGH) {
-    receiver_pulse_start[0] = micros();
-  } else {
-    //otherwise, the pin has gone LOW
-    //only worry about this if the timer has actually started
-    if (receiver_pulse_start[0] != 0) {
-      //record the pulse time
-      ThrottlePulse = ((volatile int)micros() - receiver_pulse_start[0]);
-      //restart the timer
-      receiver_pulse_start[0] = 0;
-    }
-  }
-}
+void calcChannel1() { calcChannel(RC_Throttle_Index, ThrottleChannel_Pin); }
+void calcChannel2() { calcChannel(RC_Steering_Index, SteeringChannel_Pin); }
+void calcChannel3() { calcChannel(RC_RearAxles_Index, MixSteeringChannel_Pin); }
+
+
 

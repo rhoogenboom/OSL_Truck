@@ -97,6 +97,10 @@
         const byte NFR_CSN             =    4;                       // The Arduino pin connected to the NFR CSN pin D4/pin1
         const byte NFR_CE              =    3;                       // The Arduino pin connected to the NFR CE pin D3/pin7
         
+#define RC_Throttle_Index  0
+#define RC_Steering_Index  1
+#define RC_RearAxles_Index  3
+
 
     // Useful names 
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
@@ -124,6 +128,7 @@
     // STARTUP
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
         boolean Startup                =  true;                 // This lets us run a few things in the main loop only once instead of over and over
+        int loopCounter = 0;
 
     // DRIVING
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
@@ -133,11 +138,11 @@
         boolean StoppedLongTime        = false;                 // Have we been stopped for a long time (actual length of time set on the UserConfig tab - LongStopTime_mS)
 
         typedef char DRIVEMODES; 
-        #define UNKNOWN      0
-        #define STOP         1
-        #define FWD 	     2
-        #define REV          3
-        #define LAST_MODE    REV
+        #define UNKNOWN     0
+        #define STOP        1
+        #define FWD         2
+        #define REV         3
+        #define LAST_MODE   REV
 
         const __FlashStringHelper *printMode(DRIVEMODES Type);     //Returns a character string that is name of the drive mode.
         
@@ -150,7 +155,9 @@
         };
 
         //RC channel variables 
-        volatile unsigned long receiver_pulse_start[3];                // Array to keep track of 3 timer values for calculating the pulse width of a receiver channel
+        const int channelCount = 3;
+        volatile unsigned long receiver_pulse_start[channelCount];     // Array to keep track of 3 timer values for calculating the pulse width of a receiver channel
+        volatile int pulse_time[channelCount];                         //calcSignal is the interrupt handler 
 
         // Throttle
         int ThrottleCommand            =     0;                 // A mapped value of ThrottlePulse to (0, MapPulseFwd/Rev) where MapPulseFwd/Rev is the maximum FWD/REV speed (100, or less if governed)
@@ -167,6 +174,8 @@
         boolean SteeringChannelPresent;                         // On startup we check to see if this channel is connected, if not, this variable gets set to False and we don't bother checking for it again until reboot
         int TurnCommand                =     0;                 // A mapped value of ThrottlePulse from (TurnPulseMin/TurnPulseMax) to MaxLeft/MaxRight turn (100 each way, or less if governed)
         volatile int TurnPulse;                                 // Positive = Right, Negative = Left <TurnPulseCenter - TurnPulseMin> to <0> to <TurnPulseCenter + TurnPulseMax>
+        volatile int MixedTurnPulse;                            // 
+
         int TurnPulseMin;                                       // Will ultimately be determined by setup procedure to read max travel on stick, or from EEPROM if setup complete
         int TurnPulseMax;                                       // Will ultimately be determined by setup procedure to read max travel on stick, or from EEPROM if setup complete
         int TurnPulseCenter;                                    // EX: 1000 + ((2000-1000)/2) = 1500. If Pulse = 1000 then -500, 1500 = 0, 2000 = 500
@@ -331,12 +340,6 @@ void setup()
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
        Serial.begin(BaudRate);  
 
-    //WIFI
-        radio.begin();
-        radio.openWritingPipe(address);
-        radio.setPALevel(RF24_PA_MIN);
-        radio.stopListening();
-
     // PINS
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
         pinMode(RedLED, OUTPUT);                                // Set RedLED pin to output
@@ -351,28 +354,36 @@ void setup()
         }
 
         // Timer values for receiver channels
-        for (int i=0;i<3;i++) {
+        for (int i=0;i<channelCount;i++) {
           receiver_pulse_start[i] = 0;
         }
 
-        // Set these pins to input
-        pinMode(ThrottleChannel_Pin, INPUT);             
-        pinMode(SteeringChannel_Pin, INPUT);
-        pinMode(Channel3_Pin, INPUT);
-        pinMode(MixSteeringChannel_Pin, INPUT);
+        if (INTERUPT_IO) { 
+          // Set these pins to input - not required
+//          pinMode(ThrottleChannel_Pin, INPUT);             
+//          pinMode(SteeringChannel_Pin, INPUT);
+//          pinMode(Channel3_Pin, INPUT);
+//          pinMode(MixSteeringChannel_Pin, INPUT);
+          // Hook up interrupt handler functions for when data comes in
+          attachInterrupt(digitalPinToInterrupt(ThrottleChannel_Pin), calcChannel1, CHANGE);
+          attachInterrupt(digitalPinToInterrupt(SteeringChannel_Pin), calcChannel2, CHANGE);
+          attachInterrupt(digitalPinToInterrupt(MixSteeringChannel_Pin), calcChannel3, CHANGE);
+        } else {
+          pinMode(ThrottleChannel_Pin, INPUT_PULLUP);
+          pinMode(SteeringChannel_Pin, INPUT_PULLUP);
+          pinMode(MixSteeringChannel_Pin, INPUT_PULLUP);
+        }
 
-        // Hook up interrupt handler functions for when data comes in
-        attachInterrupt(digitalPinToInterrupt(ThrottleChannel_Pin), calcChannel1, CHANGE);
-        attachInterrupt(digitalPinToInterrupt(SteeringChannel_Pin), calcChannel2, CHANGE);
         attachInterrupt(digitalPinToInterrupt(Channel3_Pin), calcMultiPropChannel, CHANGE);
-        attachInterrupt(digitalPinToInterrupt(MixSteeringChannel_Pin), calcChannel4, CHANGE);
-
         pinMode(SetupButton, INPUT_PULLUP);    
+
+        //read the input from the potmeter
+        pinMode(PotMeter, INPUT); 
 
     // CONNECT TO RECEIVER
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
         Failsafe = true;                                        // Set failsafe to true
-        GetRxCommands();                                        // If a throttle signal is measured, Failsafe will turn off
+       // GetRxCommands();                                        // If a throttle signal is measured, Failsafe will turn off
         SteeringChannelPresent = true; //CheckSteeringChannel();        // Check for the presence of a steering channel. If we don't find it here, we won't be checking for it again until the board is rebooted
         //Channel3Present = CheckChannel3();                      // Check for the presence of Channel 3. If we don't find it here, we won't be checking for it again until the board is rebooted
 
@@ -398,6 +409,12 @@ void setup()
         randomSeed(analogRead(0));
         backfire_interval = random(BF_Short, BF_Long);
         backfire_timeout  = BF_Time + random(BF_Short, BF_Long);
+
+    //WIFI
+        radio.begin();
+        radio.openWritingPipe(address);
+        radio.setPALevel(RF24_PA_MIN);
+        radio.stopListening();
 }
 
 
@@ -935,13 +952,28 @@ void loop()
     // ------------------------------------------------------------------------------------------------------------------------------------------------
         // send state over wifi
         transmitControllerInfo();
-
+        DumpControllerValues();
 } // End of Loop
 
+void DumpControllerValues() {
+  if (PRINTDEBUG()) {
+//    Serial.print(ThrottlePulse); Serial.print("    ");
+//    Serial.print(TurnPulse); Serial.print("    ");
+//    Serial.print(MixedTurnPulse); Serial.println("    ");
+    Serial.println(controller.printDebugInfo());
+    loopCounter = 1;
+  }
+  loopCounter++;  
+}
 
-
-
-
+bool PRINTDEBUG() {
+   if (loopCounter % 8 == 0) {
+    loopCounter = 1;
+    return true;
+  }
+  loopCounter++;   
+  return false;
+}
 
 void DumpDebug()
 {
