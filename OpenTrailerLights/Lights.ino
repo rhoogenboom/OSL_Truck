@@ -24,128 +24,14 @@ void SetupLights(int WhatScheme)
 // ------------------------------------------------------------------------------------------------------------------------------------------------>  
 // SETLIGHTS - the main function which assigns the appropriate setting to each light based on the current actual drive mode (different from commanded drive mode)
 // ------------------------------------------------------------------------------------------------------------------------------------------------>  
-void SetLights(int DriveMode)
+void SetLights()
 {
-    int SaveSetting[NumLights];
-    int j;
-
-    int light;
-    int channelItem;
-    unsigned int channelCount = 0;
-    unsigned int counter = 1;
-
-    // figure out if we need to switch something on by the multi channel
-    for (channelItem=1; channelItem <= 8; channelItem++) {
-       // is this channel switched on 
-       if ( multi_prop[channelItem] >= Channel3PulseCenter + 150) {
-          channelCount = channelCount + counter;
-       }
-       counter = counter << 1;
-    }
-
-        // Loop through each light, assign the setting appropriate to its state
-        for (j=0; j<NumLights; j++)
-        {
-
-        if (LightSettings[j][0] > 0) {
-          // should this light be by any of the current channels which are on?
-          if ((LightSettings[j][0] & channelCount) > 0) {
-              //look like so
-              SaveSetting[j] = ON;
-          } else {
-              //nope, so switch it off, or overrule by drive mode
-              SaveSetting[j] = OFF;
-          }
-        }
-          
-        // We will use the temporary variable SaveSetting to assign the setting for this light. 
-        // A light could have multiple settings apply at one time, be we can only set it to one thing.
-        // Therefore each setting is ranked by importance. If multiple settings apply to a light, 
-        // the setting applied LAST will be the one used (each check can overwrite the prior one). 
-        // You can re-order the checks below, the least important should come first, and most important last.
-
-        // Next - does this light have a setting related to Drive Mode? (Forward, reverse, stop)
-        // --------------------------------------------------------------------------------------------------->>
-        switch (DriveMode) {
-            case FWD:
-                if (LightSettings[j][StateFwd]  != NA) { SaveSetting[j] = LightSettings[j][StateFwd]; }
-                break;
-            case REV:
-                if (LightSettings[j][StateRev]  != NA) { SaveSetting[j] = LightSettings[j][StateRev]; }
-                break;
-            case STOP:
-                // We have two stop states: 
-                // StateStop occurs when the vehicle stops
-                // StateStopDelay occurs when the vehicle has been stopped for LongStopTime_mS and will supersede StateStop when it occurs (if not NA)
-                if (LightSettings[j][StateStop] != NA) { SaveSetting[j] = LightSettings[j][StateStop]; }
-                if (LightSettings[j][StateStopDelay] != NA && StoppedLongTime == true) { SaveSetting[j] = LightSettings[j][StateStopDelay]; }
-                break;
-        }
-
-
-        // Next - does this light come on during deceleration (probably Backfiring?)
-        // --------------------------------------------------------------------------------------------------->>        
-        if (canBackfire)
-        {
-            if (LightSettings[j][StateDecel] != NA) { SaveSetting[j] = LightSettings[j][StateDecel]; } // Or we can allow any setting during deceleration
-        }
-
-        // Next - 
-        // --------------------------------------------------------------------------------------------------->>        
-        if (Overtaking)
-        {
-            if (LightSettings[j][StateAccel] != NA) { SaveSetting[j] = LightSettings[j][StateAccel]; } 
-        }
-        
-        // Next - does this light come on during braking?
-        // --------------------------------------------------------------------------------------------------->>        
-        if (Braking)
-        {
-            if (LightSettings[j][StateBrake] != NA) { SaveSetting[j] = LightSettings[j][StateBrake]; }
-        }
-    
-
-        // Next - does this light come on during turns? 
-        // --------------------------------------------------------------------------------------------------->>        
-        if (TurnCommand > 0)    // Right Turn
-        {
-            // If we have a blink command on right turn, and if we have the BlinkTurnOnlyAtStop = true, 
-            // then we only appy the turn signal if we are stopped AND if the turn signal delay has expired (TurnSignal_Enable = true)
-            if ((LightSettings[j][StateRT] == BLINK || LightSettings[j][StateRT] == SOFTBLINK) && (BlinkTurnOnlyAtStop == true))
-            {
-                if ((DriveMode == STOP) && (TurnSignal_Enable == true)) { SaveSetting[j] = LightSettings[j][StateRT]; }
-            }
-            // Otherwise if it is any other setting, or if the BlinkTurnOnlyAtStop flag is not true, then we apply the setting normally
-            else if (LightSettings[j][StateRT] != NA) { SaveSetting[j] = LightSettings[j][StateRT]; }
-        }
-        if (TurnSignalOverride > 0) // Artificial Right Turn
-        {
-            // In this case we want to artificially create a turn signal even though the wheel may or may not be turned.
-            // We ignore driving state or TurnSignal_Enable state 
-            if (LightSettings[j][StateRT] == BLINK || LightSettings[j][StateRT] == SOFTBLINK) { SaveSetting[j] = LightSettings[j][StateRT]; }
-        }
-
-        if (TurnCommand < 0 || TurnSignalOverride < 0)    // Left Turn
-        {
-            // If we have a blink command on left turn, and if we have the BlinkTurnOnlyAtStop = true, 
-            // then we only appy the turn signal if we are stopped AND if the turn signal delay has expired (TurnSignal_Enable = true)
-            if ((LightSettings[j][StateLT] == BLINK || LightSettings[j][StateLT] == SOFTBLINK) && (BlinkTurnOnlyAtStop == true))
-            {
-                if ((DriveMode == STOP) && (TurnSignal_Enable == true)) { SaveSetting[j] = LightSettings[j][StateLT]; }
-            }
-            // Otherwise if it is any other setting, or if the BlinkTurnOnlyAtStop flag is not true, then we apply the setting normally
-            else if (LightSettings[j][StateLT] != NA) { SaveSetting[j] = LightSettings[j][StateLT]; }
-        }
-        if (TurnSignalOverride < 0) // Artificial Left Turn
-        {
-            // In this case we want to artificially create a turn signal even though the wheel may or may not be turned.
-            // We ignore driving state or TurnSignal_Enable state 
-            if (LightSettings[j][StateLT] == BLINK || LightSettings[j][StateLT] == SOFTBLINK) { SaveSetting[j] = LightSettings[j][StateLT]; }
-        }
-   
+    // Loop through each light, assign the setting appropriate to its state
+    for (int j=0; j<NumLights; j++)
+    {
         // Light "j" now has a single setting = SaveSetting[j]
         // We call the function that will set this light to that setting
-        SetLight(j, SaveSetting[j]);
+        SetLight(j, controller.getLight(j));
         controller.setLight(j, SaveSetting[j]);          
     }
 
