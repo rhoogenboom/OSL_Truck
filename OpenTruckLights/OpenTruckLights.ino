@@ -523,8 +523,8 @@ void loop()
 
     // GET COMMANDS FROM RECEIVER
     // ------------------------------------------------------------------------------------------------------------------------------------------------>    
-        GetRxCommands();
-
+    GetRxCommands();
+    transmitControllerInfo('1');
     
     // DETECT IF THE USER WANTS TO ENTER CHANGE-SCHEME-MODE
     // ------------------------------------------------------------------------------------------------------------------------------------------------>    
@@ -939,21 +939,17 @@ void loop()
             Serial.print(F("Actual Drive Mode: "));
             Serial.println(printMode(DriveMode));
         }
-    
+ 
+    DriveMode_Previous = DriveMode;
+    DriveModeCommand_Previous = DriveModeCommand;
+    ThrottleCommand_Previous = ThrottleCommand;
 
-    //  SAVE COMMANDS FOR NEXT ITERATION
-    // ------------------------------------------------------------------------------------------------------------------------------------------------>  
-        // Set previous variables to current
-        DriveMode_Previous = DriveMode;
-        DriveModeCommand_Previous = DriveModeCommand;
-        ThrottleCommand_Previous = ThrottleCommand;
+    // send state over wifi
+//    transmitControllerInfo('2');
 
-    // NFR
-    // ------------------------------------------------------------------------------------------------------------------------------------------------
-        // send state over wifi
-        transmitControllerInfo();
-        DumpControllerValues();
-} // End of Loop
+    //DumpControllerValues();
+} 
+
 
 void DumpControllerValues() {
   if (PRINTDEBUG()) {

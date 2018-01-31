@@ -8,7 +8,7 @@ void GetRxCommands()
     while(Failsafe)
     {
         if (DEBUG) Serial.println(F("RX Disconnected!"));
-        transmitControllerInfo();
+        transmitControllerInfo(1);
         ToggleAllLights();                                       // If the receiver isn't connected, pause the program and flash all the lights
         delay(50);
         GetThrottleCommand();

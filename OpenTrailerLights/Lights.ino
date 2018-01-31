@@ -32,7 +32,6 @@ void SetLights()
         // Light "j" now has a single setting = SaveSetting[j]
         // We call the function that will set this light to that setting
         SetLight(j, controller.getLight(j));
-        controller.setLight(j, SaveSetting[j]);          
     }
 
     // Now we have done looping through all the lights, and setting them all. 
@@ -45,15 +44,15 @@ void SetLights()
     // If braking, both are on. 
     // If right turn, green LED blinks quickly
     // If left turn, red LED blinks quickly
-    if (LED_DEBUG)
-    {
-        if (DriveMode == FWD)  { digitalWrite(RedLED , LOW ) ; digitalWrite(GreenLED, HIGH) ; }
-        if (DriveMode == REV)  { digitalWrite(RedLED , HIGH) ; digitalWrite(GreenLED, LOW ) ; }
-        if (DriveMode == STOP) { digitalWrite(RedLED , LOW ) ; digitalWrite(GreenLED, LOW ) ; }    
-        if (Braking == true)   { digitalWrite(RedLED , HIGH) ; digitalWrite(GreenLED, HIGH) ; }
-        if (TurnCommand > 0)   { GreenBlink(); }    // Right turn
-        if (TurnCommand < 0)   { RedBlink();   }    // Left turn
-    }
+//    if (LED_DEBUG)
+//    {
+//        if (DriveMode == FWD)  { digitalWrite(RedLED , LOW ) ; digitalWrite(GreenLED, HIGH) ; }
+//        if (DriveMode == REV)  { digitalWrite(RedLED , HIGH) ; digitalWrite(GreenLED, LOW ) ; }
+//        if (DriveMode == STOP) { digitalWrite(RedLED , LOW ) ; digitalWrite(GreenLED, LOW ) ; }    
+//        if (Braking == true)   { digitalWrite(RedLED , HIGH) ; digitalWrite(GreenLED, HIGH) ; }
+//        if (TurnCommand > 0)   { GreenBlink(); }    // Right turn
+//        if (TurnCommand < 0)   { RedBlink();   }    // Left turn
+//    }
 
 }
 
@@ -117,9 +116,6 @@ void SetLight(int WhatLight, int WhatSetting)
         case DIM:
             DimLight(WhatLight);
             break;
-        case BACKFIRE:
-            LightBackfire(WhatLight);
-            break;            
         case XENON:
             TurnOnXENONLight(WhatLight);
             break;            
@@ -292,8 +288,7 @@ void FadeBlink(int WhatLight, boolean fadeUp, int mS)
         
         if (fadeUp) // fade from off (or DIM) up to full bright
         {   
-            if (LightSettings[WhatLight][Channel3] == DIM) fbrightness = DimLevel<<8;   // Starting point is DIM
-            else fbrightness = 275.0;                                                   // Starting point is full OFF
+            fbrightness = 275.0;                                                   // Starting point is full OFF
 
             // Ramp up
             while (fbrightness < 65536.0) 
@@ -309,9 +304,8 @@ void FadeBlink(int WhatLight, boolean fadeUp, int mS)
         {
             // Start at whatever level the light is already at, but should be full on
             fbrightness = pow((float)PWM_Step[WhatLight],2); 
-            
-            if (LightSettings[WhatLight][Channel3] == DIM) LowLevel = DimLevel<<8;  // End point is DIM 
-            else LowLevel = 256.0;                                                  // End point is full OFF
+   
+            LowLevel = 256.0;                                                  // End point is full OFF
 
             while (fbrightness > LowLevel) 
             {   
@@ -321,7 +315,6 @@ void FadeBlink(int WhatLight, boolean fadeUp, int mS)
                 fbrightness -= (fbrightness / 5);
                 delay(mS);
             }
-            if (LightSettings[WhatLight][Channel3] != DIM) TurnOffLight(WhatLight);    // Turn it completely off
         }
     }
     else
@@ -333,52 +326,6 @@ void FadeBlink(int WhatLight, boolean fadeUp, int mS)
     
 
 
-// ------------------------------------------------------------------------------------------------------------------------------------------------>  
-// LIGHTBACKFIRE - briefly and randomly light a led
-// All credit for backfiring code goes to Sergio Pizzotti
-// ------------------------------------------------------------------------------------------------------------------------------------------------>  
-void LightBackfire(int WhatLight)
-{
-    if (canBackfire) 
-    {   // Has enough time passed to flicker the backfire LED?
-        if(millis() - Backfire_millis > backfire_interval) 
-        {   // Save time for next check
-            Backfire_millis = millis();   
-            // Change state of backfire LED
-            for (int i=0; i<NumLights; i++)
-            {    
-                if (LightSettings[i][StateDecel] == BACKFIRE) {ReverseLight(i); }
-            }
-            // Calculate new random interval for the next flicker
-            backfire_interval = random(BF_Short, BF_Long);
-        }
-    }
-}
-
-void BackfireOff()
-{
-    // Time up - stop backfire effect
-    canBackfire = false;
-    // Reset the random backfire timeout for the next event
-    backfire_timeout = BF_Time + random(BF_Short, BF_Long);
-}
-
-
-
-// ------------------------------------------------------------------------------------------------------------------------------------------------>  
-// OVERTAKEOFF - Overtaking time is up
-// ------------------------------------------------------------------------------------------------------------------------------------------------>  
-void OvertakeOff()
-{
-    // Time up - stop the overtake effects
-    Overtaking = false;
-    for (int i=0; i<NumLights; i++)
-    {   // The overtaking effect can cause a Xenon effect to re-start, so in the event a Xenon effect is defined for this same light,
-        // we go ahead and flag it complete. 
-        if (LightSettings[i][StateAccel] != NA) { Xenon_EffectDone[i] = 1; }
-    }
-}
-
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------>  
 // TURN SIGNAL - Artificial turn signal cancel
@@ -386,10 +333,10 @@ void OvertakeOff()
 // If TurnSignalOverride is not zero, then it acts as an artificial turn signal command, keeping the turn signals on even after the car has begun
 // to move forward. But it only does so for a brief period of time (set by the user in TurnFromStartContinue_mS in UserConfig.h). When that time
 // runs out this function is called which sets TurnSignalOverride back to 0. 
-void ClearBlinkerOverride(void)
-{
-    TurnSignalOverride = 0;
-}
+//void ClearBlinkerOverride(void)
+//{
+//    TurnSignalOverride = 0;
+//}
 
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------>  
@@ -400,8 +347,7 @@ void BlinkLight(int WhatLight)
     if (Blinker) TurnOnLight(WhatLight);
     else
     {
-        if (LightSettings[WhatLight][Channel3] == DIM) DimLight(WhatLight);
-        else TurnOffLight(WhatLight);
+      TurnOffLight(WhatLight);
     }
 }
 
@@ -526,8 +472,6 @@ void BlinkAllLights(int HowManyTimes)
             if (!PriorState)
             {    
                 // Turn everything on
-                GreenLedOn();
-                RedLedOn();
                 for (int j=0; j<NumLights; j++)
                 {   TurnOnLight(j); } 
                 PriorState = true;
@@ -540,8 +484,6 @@ void BlinkAllLights(int HowManyTimes)
             if (PriorState)
             {
                 // Turn everything off
-                GreenLedOff();
-                RedLedOff();
                 for (int j=0; j<NumLights; j++)
                 {   TurnOffLight(j); }        
                 PriorState = false;

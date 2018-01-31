@@ -20,30 +20,6 @@ void FastBlinkLights()
 }
 
 
-// ------------------------------------------------------------------------------------------------------------------------------------------------>  
-// STARTBLINKING_MS - Used by the Radio_Setup routines, this will blink a given LED a certain number of times and then stop
-// ------------------------------------------------------------------------------------------------------------------------------------------------>  
-unsigned int StartBlinking_ms(int LED, int BlinkTimes, int ms)
-{
-    switch (BlinkTimes)
-    {
-        case 1:
-            if (LED == GreenLED) { return timer.setInterval(ms, GreenBlinkOne); }
-            if (LED == RedLED)   { return timer.setInterval(ms, RedBlinkOne);   }
-            break;
-        case 2:
-            if (LED == GreenLED) { return timer.setInterval(ms, GreenBlinkTwo); }
-            if (LED == RedLED)   { return timer.setInterval(ms, RedBlinkTwo);   }
-            break;
-        case 3:
-            if (LED == GreenLED) { return timer.setInterval(ms, GreenBlinkThree); }
-            if (LED == RedLED)   { return timer.setInterval(ms, RedBlinkThree);   }
-            break;
-        default:
-            break;        
-    }
-}
-
 
 
 void StopBlinking(unsigned int TimerID)
@@ -71,12 +47,6 @@ unsigned int StartWaiting_sec(int seconds)
 void SetTimeUp()
 {
     TimeUp = true;
-}
-
-
-void ExitChangeSchemeMode()
-{
-    ChangeSchemeMode = false;    // As soon as this gets set to false, Change-Scheme-Mode exits
 }
 
 
