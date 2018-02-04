@@ -55,8 +55,12 @@
 //RHO TODO
 // remove backfire light code
 
+//check steering overrule with magnet potmeter, seems a bit short
+
 // fix check code of ch3 is a multiprop channel
 // fix setup code for multiprop channel
+// run setup for centering all channels
+// store center of platecontrol in eeprom
 
 
 
@@ -945,7 +949,7 @@ void loop()
     ThrottleCommand_Previous = ThrottleCommand;
 
     // send state over wifi
-//    transmitControllerInfo('2');
+    transmitControllerInfo('2');
 
     //DumpControllerValues();
 } 

@@ -28,7 +28,6 @@ void receiveControllerInfo() {
     char wifiBuffer[32] = "";
     radio.read(&wifiBuffer, sizeof(wifiBuffer));
     whatToProcess = controller.processSettings(wifiBuffer);
-    Serial.println(whatToProcess);
   }
 
   switch (whatToProcess) {
