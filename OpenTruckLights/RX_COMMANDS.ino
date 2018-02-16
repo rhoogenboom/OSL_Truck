@@ -8,9 +8,9 @@ void GetRxCommands()
     while(Failsafe)
     {
         if (DEBUG) Serial.println(F("RX Disconnected!"));
-        transmitControllerInfo(1);
+        transmitControllerInfo('1');
         ToggleAllLights();                                       // If the receiver isn't connected, pause the program and flash all the lights
-        delay(50);
+        delay(150);
         GetThrottleCommand();
     }    
 
@@ -40,6 +40,7 @@ int GetThrottleCommand()
     if ((ThrottlePulse == 0) || (ThrottlePulse > PulseMax_Bad) || (ThrottlePulse < PulseMin_Bad))
     {   // Timed out waiting for a signal, or measured a bad signal
         // Set Failsafe flag, set Throttle to 0
+        controller.setReceiverState(false);
         Failsafe = true;
         ThrottleCommand = 0;
     }

@@ -332,6 +332,7 @@
         //22    PB3 ( MISO/PCINT3 ) Digital pin 50 (MISO) MISO          NFR
         const byte address[6] = {0x66,0x68,0x7b,0x4a,0x63};   
 
+
         OSLController controller;         // Wrapper object around 3 RC channels, drive mode and 8 light switches
 
 
@@ -506,7 +507,6 @@ void loop()
         Startup = false;                                        // This ensures the startup stuff only runs once
 
    }
-
 
 // ETERNAL LOOP
 // ------------------------------------------------------------------------------------------------------------------------------------------------>    
@@ -951,19 +951,12 @@ void loop()
     // send state over wifi
     transmitControllerInfo('2');
 
-    //DumpControllerValues();
+   // DumpControllerValues();
 } 
 
 
 void DumpControllerValues() {
-  if (PRINTDEBUG()) {
-//    Serial.print(ThrottlePulse); Serial.print("    ");
-//    Serial.print(TurnPulse); Serial.print("    ");
-//    Serial.print(MixedTurnPulse); Serial.println("    ");
     Serial.println(controller.printDebugInfo());
-    loopCounter = 1;
-  }
-  loopCounter++;  
 }
 
 bool PRINTDEBUG() {

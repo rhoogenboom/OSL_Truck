@@ -66,8 +66,21 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 
-const byte NFR_CSN             =    4;                       // The Arduino pin connected to the NFR CSN pin D4/pin1
 const byte NFR_CE              =    3;                       // The Arduino pin connected to the NFR CE pin D3/pin7
+const byte NFR_CSN             =    4;                       // The Arduino pin connected to the NFR CSN pin D4/pin1
+
+/*
+ * NFR wiring
+ * VCC - 3.3v!!!!
+ * GND - GND
+ * CSN / CE see above
+ * Nano:
+ * SCK - pin 13
+ * MOSI - pin 11
+ * MISO = pin 12
+ * 
+ * 
+ */
 
 int SERVO_VOOR_PIN = 6;        //Arduino nano pin to which the servo is attached D48/pin36
 int SERVO_ACHTER_PIN = 7;      //Arduino pin to which the servo is attached D49/pin35

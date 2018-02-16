@@ -7,7 +7,6 @@ void transmitControllerInfo(char whatToTransmit) {
     case '1' :
       controller.getControllerInfo().toCharArray(text, 32);
       radio.write(&text, sizeof(text));    
-      Serial.println("1");
     break;
     case '2' :
        //write light 0-4
@@ -18,7 +17,6 @@ void transmitControllerInfo(char whatToTransmit) {
       //write light 5-7
       controller.getLightsInfo5_8().toCharArray(text, 32);
       radio.write(&text, sizeof(text));   
-      Serial.println("2");
     break;
     default:
     break;

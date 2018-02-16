@@ -27,7 +27,9 @@ void receiveControllerInfo() {
   if (radio.available()) {
     char wifiBuffer[32] = "";
     radio.read(&wifiBuffer, sizeof(wifiBuffer));
+    //Serial.println(wifiBuffer);
     whatToProcess = controller.processSettings(wifiBuffer);
+    //Serial.println(whatToProcess);
   }
 
   switch (whatToProcess) {
@@ -35,8 +37,9 @@ void receiveControllerInfo() {
       //deal with axl update
       //only update when there is a valid position
       if (controller.getController3() != -1) {
+          Serial.println(controller.getController3());
           updateServoPositions(limitToMaxPositionsServo(controller.getController3()));
-          delay(250);
+          delay(50);
       }       
       break;
     case 1 :
