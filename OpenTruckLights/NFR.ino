@@ -6,17 +6,18 @@ void transmitControllerInfo(char whatToTransmit) {
   switch (whatToTransmit) {
     case '1' :
       controller.getControllerInfo().toCharArray(text, 32);
-      radio.write(&text, sizeof(text));    
+      radio.write(&text, sizeof(text));
+      delay(10);    
     break;
     case '2' :
        //write light 0-4
       controller.getLightsInfo1_4().toCharArray(text, 32);
-      radio.write(&text, sizeof(text));
-      delay(10);
+//      radio.write(&text, sizeof(text));
+//      delay(10);
     
       //write light 5-7
       controller.getLightsInfo5_8().toCharArray(text, 32);
-      radio.write(&text, sizeof(text));   
+//      radio.write(&text, sizeof(text));   
     break;
     default:
     break;
