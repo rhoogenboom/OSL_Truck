@@ -402,6 +402,9 @@ void setup()
         else
         {    Load_EEPROM();        }                            // Otherwise, load the values from EEPROM
 
+    // overwrite reverse setting (no working setup code and handling now)
+    ThrottleChannelReverse = true;
+
     // RUN LIGHT SETUP
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
         SetupLights(CurrentScheme);                             // Set the lights to the Scheme last saved in EEPROM
