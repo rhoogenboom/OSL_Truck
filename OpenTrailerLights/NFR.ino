@@ -29,7 +29,6 @@ void receiveControllerInfo() {
     radio.read(&wifiBuffer, sizeof(wifiBuffer));
     //Serial.println(wifiBuffer);
     whatToProcess = controller.processSettings(wifiBuffer);
-    //Serial.println(whatToProcess);
   }
 
   switch (whatToProcess) {
@@ -39,7 +38,7 @@ void receiveControllerInfo() {
       if (controller.getController3() != -1) {
           Serial.println(controller.getController3());
           updateServoPositions(limitToMaxPositionsServo(controller.getController3()));
-          delay(50);
+          delay(100);
       }       
       break;
     case 1 :
@@ -49,6 +48,7 @@ void receiveControllerInfo() {
       
       break;
     default:
+      Serial.print("Invalid: "); Serial.println(whatToProcess);    
     break;
   }
 
