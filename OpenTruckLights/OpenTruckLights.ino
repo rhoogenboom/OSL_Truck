@@ -89,7 +89,7 @@
         //receiver items and model inputs
         const byte ThrottleChannel_Pin =    21;                      // The Arduino pin connected to the throttle channel input - D21/pin43
         const byte SteeringChannel_Pin =    20;                      // The Arduino pin connected to the steering channel input - D20/pin44
-        const byte Channel3_Pin        =    19;                      // The Arduino pin connected to the multichannel input - D19/pin45
+        const byte MultiChannel_Pin        =    19;                      // The Arduino pin connected to the multichannel input - D19/pin45
         const byte MixSteeringChannel_Pin = 18;                      // The Arduino pin connected to the steering channel for mixing the rear axles - D18/pin46
         const byte PotMeter            =    A1;                      // The Arduino pin connected to the potentio-meter from the 5th wheel A1/pin96
 
@@ -367,7 +367,7 @@ void setup()
           // Set these pins to input - not required
 //          pinMode(ThrottleChannel_Pin, INPUT);             
 //          pinMode(SteeringChannel_Pin, INPUT);
-//          pinMode(Channel3_Pin, INPUT);
+//          pinMode(MultiChannel_Pin, INPUT);
 //          pinMode(MixSteeringChannel_Pin, INPUT);
           // Hook up interrupt handler functions for when data comes in
           attachInterrupt(digitalPinToInterrupt(ThrottleChannel_Pin), calcChannel1, CHANGE);
@@ -379,7 +379,7 @@ void setup()
           pinMode(MixSteeringChannel_Pin, INPUT_PULLUP);
         }
 
-        attachInterrupt(digitalPinToInterrupt(Channel3_Pin), calcMultiPropChannel, CHANGE);
+        attachInterrupt(digitalPinToInterrupt(MultiChannel_Pin), calcMultiPropChannel, CHANGE);
         pinMode(SetupButton, INPUT_PULLUP);    
 
         //read the input from the potmeter
@@ -404,6 +404,13 @@ void setup()
 
     // overwrite reverse setting (no working setup code and handling now)
     ThrottleChannelReverse = true;
+    ThrottlePulseCenter = 1490;
+    ThrottlePulseMin = 1169;
+    ThrottlePulseMax = 1811;
+    TurnPulseCenter = 1503;
+    TurnPulseMin = 1172;
+    TurnPulseMax = 1807;
+    Channel3PulseCenter = 1472;
 
     // RUN LIGHT SETUP
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
@@ -434,6 +441,26 @@ void setup()
 
 void loop()
 {
+//  while (true) {
+//    //Serial.println(analogRead(PotMeter));
+//    Serial.println(F("Steering:"));
+//    for(int i = 900; i<=2100; i=i+50) {
+//      
+//      Serial.print(F("i: ")); Serial.print(i); Serial.print(F(", pot: ")); Serial.print(analogRead(PotMeter)); 
+//      Serial.print(F(", result: ")); Serial.print(CalculateRearAxlePosition(i));
+//
+//      Serial.println();
+//      delay(550);
+//    }
+//    Serial.println(F("Potmeter:"));
+//    for(int i = 900; i<=2100; i=i+50) {
+//      Serial.print(F("i: ")); Serial.print(i); Serial.print(F(", pot: ")); Serial.print(analogRead(PotMeter)); 
+//      Serial.print(F(", result: ")); Serial.println(CalculateRearAxlePosition(1500));
+//      delay(550);
+//    }
+//  }
+
+  
     // LOCAL VARIABLES
     // ------------------------------------------------------------------------------------------------------------------------------------------------>    
     // Drive Modes
@@ -955,7 +982,8 @@ void loop()
     // send state over wifi
     transmitControllerInfo('2');
 
-   // DumpControllerValues();
+   //DumpControllerValues();
+   //DumpDebug();
 } 
 
 
@@ -1015,6 +1043,18 @@ void DumpDebug()
     Serial.print(F("Channel 3: "));
     if (!Channel3Present) { Serial.print(F("NOT ")); }
     Serial.println(F("CONNECTED")); 
+
+    Serial.println(F("Current RC input channel values:"));
+    Serial.println(F("Throttle    Steering      Channel3")); 
+    if (INTERUPT_IO) {
+      Serial.print(pulse_time[RC_Throttle_Index]); Serial.print("   ");
+      Serial.print(pulse_time[RC_Steering_Index]); Serial.print("   ");
+      Serial.println(pulse_time[RC_RearAxles_Index]);
+    } else {
+      Serial.print(pulseIn(ThrottleChannel_Pin, HIGH, ServoTimeout)); Serial.print("   ");  
+      Serial.print(pulseIn(SteeringChannel_Pin, HIGH, ServoTimeout)); Serial.print("   ");
+      Serial.println(pulseIn(MixSteeringChannel_Pin, HIGH, ServoTimeout));
+    }
 }
 
 

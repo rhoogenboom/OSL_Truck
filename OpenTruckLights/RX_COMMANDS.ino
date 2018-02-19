@@ -7,7 +7,10 @@ void GetRxCommands()
 
     while(Failsafe)
     {
-        if (DEBUG) Serial.println(F("RX Disconnected!"));
+        if (DEBUG) {
+          Serial.println(F("RX Disconnected!"));
+          DumpControllerValues();
+        }
         transmitControllerInfo('1');
         ToggleAllLights();                                       // If the receiver isn't connected, pause the program and flash all the lights
         delay(150);
@@ -150,7 +153,7 @@ int GetTurnCommand()
 
 void calcMultiPropChannel()
 {
-  if (digitalRead(Channel3_Pin) == HIGH) {
+  if (digitalRead(MultiChannel_Pin) == HIGH) {
     multiPropStartTime = micros();
   } else {
     MultiPropItemTime = (uint16_t)(micros() - multiPropStartTime);
