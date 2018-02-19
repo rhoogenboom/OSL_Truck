@@ -55,7 +55,7 @@ int GreenBlinker;                        // We'll use this to create a SimpleTim
             // Read channel while the user moves the sticks to the extremes
             ThrottlePulse = pulseIn(ThrottleChannel_Pin, HIGH, ServoTimeout);  
             TurnPulse = pulseIn(SteeringChannel_Pin, HIGH, ServoTimeout);
-            Channel3Pulse = pulseIn(Channel3_Pin, HIGH, ServoTimeout);
+            Channel3Pulse = pulseIn(MixSteeringChannel_Pin, HIGH, ServoTimeout);
             // Each time through the loop, only save the extreme values if they are greater than the last time through the loop. 
             // At the end we should have the true min and max for each channel.
             if (ThrottlePulse > ThrottlePulseMax)  { ThrottlePulseMax   = ThrottlePulse; }
@@ -146,7 +146,7 @@ int GreenBlinker;                        // We'll use this to create a SimpleTim
         {        
             TotThrottlePulse += pulseIn(ThrottleChannel_Pin, HIGH, ServoTimeout);  
             TotTurnPulse += pulseIn(SteeringChannel_Pin, HIGH, ServoTimeout);
-            TotChannel3Pulse += pulseIn(Channel3_Pin, HIGH, ServoTimeout);
+            TotChannel3Pulse += pulseIn(MixSteeringChannel_Pin, HIGH, ServoTimeout);
             // Increment reading count
             Count++;
             delay(10);
@@ -232,7 +232,7 @@ int GreenBlinker;                        // We'll use this to create a SimpleTim
             // Add to our readings 
             TotThrottlePulse += pulseIn(ThrottleChannel_Pin, HIGH, ServoTimeout);  
             TotTurnPulse += pulseIn(SteeringChannel_Pin, HIGH, ServoTimeout);  
-            TotChannel3Pulse += pulseIn(Channel3_Pin, HIGH, ServoTimeout);  
+            TotChannel3Pulse += pulseIn(MixSteeringChannel_Pin, HIGH, ServoTimeout);  
             // Increment count
             Count++;
             delay(50);

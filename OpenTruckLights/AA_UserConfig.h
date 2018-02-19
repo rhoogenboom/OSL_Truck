@@ -7,7 +7,7 @@
 
 // STATE SETTINGS
 // ------------------------------------------------------------------------------------------------------------------------------------------------>
-    #define LongStopTime_mS          10000          // The Stop Delay state only occurs when the vehicle has been stopped for some length of time, which is set here. 
+    #define LongStopTime_mS          20000          // The Stop Delay state only occurs when the vehicle has been stopped for some length of time, which is set here. 
                                                     // Recall that 1000 mS = 1 second (default value is 30 seconds)
 
 
@@ -46,7 +46,7 @@
     
 // DOUBLE TAP REVERSE
 // ------------------------------------------------------------------------------------------------------------------------------------------------>
-    #define DoubleTapReverse          true          // Most ESCs require you to tap reverse twice before the car actually goes into reverse. 
+    #define DoubleTapReverse          false          // Most ESCs require you to tap reverse twice before the car actually goes into reverse. 
                                                     // If yours is like this, set it to true. Most touring cars operate like this. 
                                                     // But if you can shift directly into reverse from forward, set this to false - this is typical of crawlers. 
                                                     
@@ -58,7 +58,7 @@
                                                     // 24hr Le Mans when overtaking)
     #define OvertakeTime               500          // How long should the overtake event last in  ms (1000ms = 1 second)
 
-    #define DecelPct                    5           // How much does the throttle need to decrease (1-100 pct) to be considered a sharp deceleration.
+    #define DecelPct                    10           // How much does the throttle need to decrease (1-100 pct) to be considered a sharp deceleration.
                                                     // This will trigger the Backfire effect for any light in the Decelerating column with the setting
                                                     // of BACKFIRE. You can put other settings in the Decelerating column besides Backfire, and they will 
                                                     // work, but they will only be enabled for the same length of time as the backfire event
@@ -103,7 +103,7 @@
 // ------------------------------------------------------------------------------------------------------------------------------------------------>
     #define DEBUG                     false         // Set this to true to receive debugging messages out the serial port. NOTE: This will make the program less responsive, 
                                                     // so turn it off when you are done troubleshooting. 
-    #define LED_DEBUG                 true          // If this is set to true, the Green LED on the board will be on whenever the car is moving forward, 
+    #define LED_DEBUG                 false          // If this is set to true, the Green LED on the board will be on whenever the car is moving forward, 
                                                     // the Red LED will come on whenever the car is moving in reverse, 
                                                     // both LEDs will turn OFF when the car is stopped,  
                                                     // both LEDs will turn ON when the car is braking,
@@ -113,8 +113,12 @@
                                                     // LED_DEBUG does not affect the performance of the circuit, so you can leave it on.                                                  
 // SERIAL
 // ------------------------------------------------------------------------------------------------------------------------------------------------>
-    #define BaudRate                 38400          // Set baud rate here if you know what you're doing and don't like the default value
+    #define BaudRate                9600// 38400          // Set baud rate here if you know what you're doing and don't like the default value
 
+
+// --------------------------------
+    // Use interupts for IO
+    #define INTERUPT_IO             false
                                                     
                                                     
 
