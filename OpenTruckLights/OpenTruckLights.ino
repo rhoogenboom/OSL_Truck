@@ -76,7 +76,7 @@
     #include <avr/pgmspace.h>
     #include <PinChangeInterrupt.h>
 
-    #include <OSLController.h>
+//    #include <OSLController.h>
     #include <SPI.h>
     #include <nRF24L01.h>
     #include <RF24.h>
@@ -332,8 +332,27 @@
         //22    PB3 ( MISO/PCINT3 ) Digital pin 50 (MISO) MISO          NFR
         const byte address[6] = {0x66,0x68,0x7b,0x4a,0x63};   
 
+//controller structure for NFR transmission
 
-        OSLController controller;         // Wrapper object around 3 RC channels, drive mode and 8 light switches
+#define transmissionInterval 250  //ms transmission interval
+unsigned int transmissionTimerID;
+
+    typedef struct
+    {
+      int8_t state;
+//      int8_t function; //no support for how the led should blink yet
+    } OSLLight;
+
+    typedef struct
+    {
+      uint16_t controller3;
+//      uint16_t controller2;  // only 1 controller
+//      uint16_t controller1;  // only 1 controller
+//      int8_t driveMode;   //no drive mode limit structure size
+      OSLLight lights[NumLights];
+    } OSLLightPacket;
+    
+volatile OSLLightPacket controller;         // Wrapper object around 3 RC channels, drive mode and 8 light switches
 
 
 // ====================================================================================================================================================>
@@ -425,12 +444,21 @@ void setup()
         backfire_interval = random(BF_Short, BF_Long);
         backfire_timeout  = BF_Time + random(BF_Short, BF_Long);
 
+//setup default controller values
+
+  controller.controller3 = 0;
+  for (int i=0; i<NumLights; i++)
+  {
+      controller.lights[i].state = OFF;                 
+  }
+
     //WIFI
         radio.begin();
         radio.openWritingPipe(address);
         radio.setPALevel(RF24_PA_MIN); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
         radio.setDataRate(RF24_1MBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS
         radio.stopListening();
+        
 }
 
 
@@ -519,6 +547,7 @@ void loop()
         
         timer.setInterval(BlinkInterval, BlinkLights);          // This will call the function BlinkLights every BlinkInterval milliseconds
         timer.setInterval(FastBlinkInterval, FastBlinkLights);  // This will call the function FastBlinkLights every FastBlinkInterval milliseconds
+        transmissionTimerID = timer.setInterval(transmissionInterval, transmitControllerInfo);
         
         currentMillis = millis();                               // Initializing some variables 
         TransitionStart = currentMillis;  
@@ -559,7 +588,6 @@ void loop()
     // GET COMMANDS FROM RECEIVER
     // ------------------------------------------------------------------------------------------------------------------------------------------------>    
     GetRxCommands();
-    transmitControllerInfo('1');
     
     // DETECT IF THE USER WANTS TO ENTER CHANGE-SCHEME-MODE
     // ------------------------------------------------------------------------------------------------------------------------------------------------>    
@@ -919,7 +947,7 @@ void loop()
 
     // WE NOW HAVE OUR ACTUAL DRIVE MODE - SET THE LIGHTS ACCORDINGLY
     // ------------------------------------------------------------------------------------------------------------------------------------------------> 
-        controller.setDriveMode(DriveMode);   
+        //controller.setDriveMode(DriveMode);   
         SetLights(DriveMode);        // SetLights will take into account whatever position Channel 3 is in, as well as the present drive mode
 
 
@@ -979,16 +1007,13 @@ void loop()
     DriveModeCommand_Previous = DriveModeCommand;
     ThrottleCommand_Previous = ThrottleCommand;
 
-    // send state over wifi
-    transmitControllerInfo('2');
-
    //DumpControllerValues();
    //DumpDebug();
 } 
 
 
 void DumpControllerValues() {
-    Serial.println(controller.printDebugInfo());
+    //Serial.println(controller.printDebugInfo());
 }
 
 bool PRINTDEBUG() {

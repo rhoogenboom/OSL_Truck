@@ -11,7 +11,6 @@ void GetRxCommands()
           Serial.println(F("RX Disconnected!"));
           DumpControllerValues();
         }
-        transmitControllerInfo('1');
         ToggleAllLights();                                       // If the receiver isn't connected, pause the program and flash all the lights
         delay(150);
         GetThrottleCommand();
@@ -38,12 +37,12 @@ int GetThrottleCommand()
     } else {
       ThrottlePulse = pulseIn(ThrottleChannel_Pin, HIGH, ServoTimeout);  
     }
-    controller.setController1(ThrottlePulse);
+    //controller.controller1 = ThrottlePulse;
     
     if ((ThrottlePulse == 0) || (ThrottlePulse > PulseMax_Bad) || (ThrottlePulse < PulseMin_Bad))
     {   // Timed out waiting for a signal, or measured a bad signal
         // Set Failsafe flag, set Throttle to 0
-        controller.setReceiverState(false);
+        //controller.controller1 = 0;
         Failsafe = true;
         ThrottleCommand = 0;
     }
@@ -97,7 +96,7 @@ int GetMixedSteeringInput()
     }
 
     //update the controller object for sending the data over
-    controller.setController3(CalculateRearAxlePosition(MixedTurnPulse));  
+    controller.controller3 = CalculateRearAxlePosition(MixedTurnPulse);  
 }  
 
 
@@ -109,7 +108,7 @@ int GetTurnCommand()
     } else {
       TurnPulse = pulseIn(SteeringChannel_Pin, HIGH, ServoTimeout);
     }
-    controller.setController2(TurnPulse);
+    //controller.controller2 = TurnPulse;
     if ((TurnPulse == 0) || (TurnPulse > PulseMax_Bad) || (TurnPulse < PulseMin_Bad))
     {   // In this case, there was no signal found on the turn channel
         TurnCommand = 0;    // If no TurnPulse, we set Turn to 0 (no turn)
