@@ -46,7 +46,7 @@
     
 // DOUBLE TAP REVERSE
 // ------------------------------------------------------------------------------------------------------------------------------------------------>
-    #define DoubleTapReverse          true          // Most ESCs require you to tap reverse twice before the car actually goes into reverse. 
+    #define DoubleTapReverse          false          // Most ESCs require you to tap reverse twice before the car actually goes into reverse. 
                                                     // If yours is like this, set it to true. Most touring cars operate like this. 
                                                     // But if you can shift directly into reverse from forward, set this to false - this is typical of crawlers. 
                                                     
