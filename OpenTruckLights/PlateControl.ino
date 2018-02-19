@@ -10,7 +10,7 @@ int previousPlatePosition;
 
 const int minValueMeasuredForPot = 0;
 const int maxValueMeasuredForPot = 1023;
-int potMiddlePosition = 504; //overruled the middle position of maxValueMeasuredForPot divided by two 2 due to the magnetic center
+int potMiddlePosition = 514; //overruled the middle position of maxValueMeasuredForPot divided by two 2 due to the magnetic center
 
 const int potMaxPositionLeft = 350; //minimale range potmeter movement left
 const int potMaxPositionRight = potMiddlePosition + (potMiddlePosition - potMaxPositionLeft); //maximal range potmeter movement right
@@ -43,12 +43,12 @@ int limitToMaxPositionsFromReceiver(int input) {
 
   //check if input is within allowed range, if not, the receive might be disconnected so we just return the middle
   if (input == 0 || input < MIN_CHANNEL || input > MAX_CHANNEL) {
-    return CHANNEL_CENTER;
+    return Channel3PulseCenter;
   } else {
     //TODO fix so we can use full stick range but still link to plate range for movement
     
     //below limits the receiver input range to the pot range so we can we can subtract or add them together
-    return map(input, MIN_CHANNEL, MAX_CHANNEL, potMaxPositionLeft, potMaxPositionRight);
+    return map(input, MIN_CHANNEL, MAX_CHANNEL, minValueMeasuredForPot, maxValueMeasuredForPot);
   }
 }
 
@@ -71,20 +71,19 @@ int mixPlateAndReceiverInput(int receiver, int potmeter) {
 
 int CalculateRearAxlePosition(int receiver) {
   // reads the value of the potentiometer
-  int analogPotmeterInput = analogRead(PotMeter); 
+  int analogPotmeterInput = analogRead(PotMeter); //input: 0-1024 
 
-  //translate the receiver input to the same range of the pot input
-  int analogReceiverInput = limitToMaxPositionsFromReceiver(receiver);
+   //translate the receiver input to the same range of the pot input
+  int analogReceiverInput = limitToMaxPositionsFromReceiver(receiver); //input: 875-2125? range: 875-2125 limit: 0-1024
 
   //mix the receiver and the pot together but only when the sticks are out of center
-  analogPotmeterInput = mixPlateAndReceiverInput(analogReceiverInput, analogPotmeterInput);
-  
+  analogPotmeterInput = mixPlateAndReceiverInput(analogReceiverInput, analogPotmeterInput); //input: 0-1024 / 0-1024; 
+
   // limit the pot values to what we expect them to be max left and right
-  analogPotmeterInput = limitToMaxPositionsOnPlate(analogPotmeterInput);  
-  
+  analogPotmeterInput = limitToMaxPositionsOnPlate(analogPotmeterInput);
+   
   // translate plate position to relative position between max left and right
   int positionPotmeter = map(analogPotmeterInput, potMaxPositionLeft, potMaxPositionRight, minValueMeasuredForPot, maxValueMeasuredForPot);
-
   return map(positionPotmeter, 0, maxValueMeasuredForPot, maxPositionLeftFrontServo, maxPositionRightFrontServo);
 }
 
