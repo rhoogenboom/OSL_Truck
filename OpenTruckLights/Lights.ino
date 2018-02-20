@@ -146,7 +146,7 @@ void SetLights(int DriveMode)
         // Light "j" now has a single setting = SaveSetting[j]
         // We call the function that will set this light to that setting
         SetLight(j, SaveSetting[j]);
-        controller.setLight(j, SaveSetting[j]);          
+        controller.lights[j].state = SaveSetting[j];          
     }
 
     // Now we have done looping through all the lights, and setting them all. 

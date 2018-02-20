@@ -31,7 +31,7 @@ void SetLights()
     {
         // Light "j" now has a single setting = SaveSetting[j]
         // We call the function that will set this light to that setting
-        SetLight(j, controller.getLight(j));
+        SetLight(j, controller.lights[j].state);
     }
 
     // Now we have done looping through all the lights, and setting them all. 
