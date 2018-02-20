@@ -322,7 +322,7 @@
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
         RF24 radio(NFR_CE, NFR_CSN); // NFR CE, CSN connections
         //NFR pin connections:
-        //Arduino
+        //Arduino MEGA
         //Pin   Pin Name            Mapped Pin Name       Connected To  Device
         //1     PG5 ( OC0B )        Digital pin 4 (PWM)   CSN           NFR
         //7     PE5 ( OC3C/INT5 )   Digital pin 3 (PWM)   CE            NFR
@@ -334,25 +334,23 @@
 
 //controller structure for NFR transmission
 
-#define transmissionInterval 250  //ms transmission interval
+#define transmissionInterval 100  //ms transmission interval
 unsigned int transmissionTimerID;
 
-    typedef struct
-    {
-      int8_t state;
-//      int8_t function; //no support for how the led should blink yet
-    } OSLLight;
+typedef struct
+{
+  uint8_t state;
+} OSLLight;
 
-    typedef struct
-    {
-      uint16_t controller3;
-//      uint16_t controller2;  // only 1 controller
-//      uint16_t controller1;  // only 1 controller
-//      int8_t driveMode;   //no drive mode limit structure size
-      OSLLight lights[NumLights];
-    } OSLLightPacket;
-    
-volatile OSLLightPacket controller;         // Wrapper object around 3 RC channels, drive mode and 8 light switches
+typedef struct
+{
+//  uint16_t controller1;
+//  uint16_t controller2;
+  uint16_t controller3;
+  OSLLight lights[12];
+} OSLLightPacket;
+
+volatile OSLLightPacket packet;
 
 
 // ====================================================================================================================================================>
@@ -446,19 +444,19 @@ void setup()
 
 //setup default controller values
 
-  controller.controller3 = 0;
+  packet.controller3 = 0;
   for (int i=0; i<NumLights; i++)
   {
-      controller.lights[i].state = OFF;                 
+      packet.lights[i].state = OFF;                 
   }
 
-    //WIFI
-        radio.begin();
-        radio.openWritingPipe(address);
-        radio.setPALevel(RF24_PA_MIN); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
-        radio.setDataRate(RF24_1MBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS
-        radio.stopListening();
-        
+  //WIFI
+  radio.begin();
+  radio.setPALevel(RF24_PA_MIN); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
+  radio.setDataRate(RF24_2MBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS
+  radio.openWritingPipe(address);
+  radio.stopListening();
+      
 }
 
 
@@ -563,7 +561,6 @@ void loop()
         MinTurn = (int)((float)MaxRightTurn * 0.2);             // This is the minimum amount of steering wheel movement considered to be a command during Change-Scheme-Mode
         RightCount = 0;
         LeftCount = 0;
-
         Startup = false;                                        // This ensures the startup stuff only runs once
 
    }

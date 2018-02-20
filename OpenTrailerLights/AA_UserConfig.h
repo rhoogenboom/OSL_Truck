@@ -22,9 +22,9 @@
 
 // DEBUGGING
 // ------------------------------------------------------------------------------------------------------------------------------------------------>
-    #define DEBUG                     true         // Set this to true to receive debugging messages out the serial port. NOTE: This will make the program less responsive, 
+    #define DEBUG                     false         // Set this to true to receive debugging messages out the serial port. NOTE: This will make the program less responsive, 
                                                     // so turn it off when you are done troubleshooting. 
-    #define LED_DEBUG                 true          // If this is set to true, the Green LED on the board will be on whenever the car is moving forward, 
+    #define LED_DEBUG                 false          // If this is set to true, the Green LED on the board will be on whenever the car is moving forward, 
                                                     // the Red LED will come on whenever the car is moving in reverse, 
                                                     // both LEDs will turn OFF when the car is stopped,  
                                                     // both LEDs will turn ON when the car is braking,

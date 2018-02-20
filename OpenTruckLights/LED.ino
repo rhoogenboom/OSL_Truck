@@ -53,7 +53,9 @@ void ToggleAllLights()
     for (int j=0; j<NumLights; j += 2)
     {    
         Status ? TurnOnLight(j) : TurnOffLight(j);
+        Status ? packet.lights[j].state = ON : packet.lights[j].state = OFF;
         Status ? TurnOffLight(j+1) : TurnOnLight(j+1);
+        Status ? packet.lights[j].state = OFF : packet.lights[j].state = ON;
     }
     
     // Flop the flip

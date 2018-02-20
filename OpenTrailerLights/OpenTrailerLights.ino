@@ -61,7 +61,7 @@
 
 #include <Servo.h>
 
-#include <OSLController.h>
+//#include <OSLController.h>
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
@@ -113,7 +113,12 @@ int CurrentScheme;                                      // Indicates which schem
 
 int ActualDimLevel;                                             // We allow the user to enter a Dim level from 0-255. Actually, we do not want them using numbers 0 or 1. The ActualDimLevel corrects for this.
                                                                 // In practice, it is unlikely a user would want a dim level of 1 anyway, as it would be probably invisible. 
-int LightPin[NumLights] = {9,10,11,6,7,8,12,13,46,5,17,45};       // These are the Arduino pins to the 8 lights  
+
+//Nano pins:
+//int LightPin[NumLights] = {9,10,11,6,7,8,12,13,46,5,17,45};       // These are the Arduino pins to the lights  
+
+//Mega pins:
+int LightPin[NumLights] = {9,10,11,6,7,8,12,13,46,5,17,45};       // These are the Arduino pins to the lights  
                                                         
 int Dimmable[NumLights] = {1,1,1,1,1,1,1,1,1,1,1,1};            // This indicates which of these pins are capable of ouputting PWM, in order. 
                                                                 // Dimmable must be true in order for the light to be capable of DIM, FADEOFF, or XENON settings
@@ -154,7 +159,20 @@ RF24 radio(NFR_CE, NFR_CSN); // NFR CE, CSN connections
 //21    PB2 ( MOSI/PCINT2 ) Digital pin  (MOSI)       MOSI          NFR
 //22    PB3 ( MISO/PCINT3 ) Digital pin  (MISO)       MISO          NFR
 
-OSLController controller;         
+typedef struct
+{
+  uint8_t state;
+} OSLLight;
+
+typedef struct
+{
+//  uint16_t controller1;
+//  uint16_t controller2;
+  uint16_t controller3;
+  OSLLight lights[12];
+} OSLLightPacket;
+
+volatile OSLLightPacket packet;
 
 // front servo (3 axles)
 Servo servoFront;   
@@ -197,9 +215,9 @@ void setup()
   updateServoPositions(1500);
 
   radio.begin();
-  radio.openReadingPipe(0, address);
   radio.setPALevel(RF24_PA_MIN); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
-  radio.setDataRate(RF24_1MBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS
+  radio.setDataRate(RF24_2MBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS  
+  radio.openReadingPipe(0, address);
   radio.startListening();
 }
 
