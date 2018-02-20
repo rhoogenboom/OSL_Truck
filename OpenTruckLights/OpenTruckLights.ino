@@ -322,7 +322,7 @@
     // ------------------------------------------------------------------------------------------------------------------------------------------------>
         RF24 radio(NFR_CE, NFR_CSN); // NFR CE, CSN connections
         //NFR pin connections:
-        //Arduino
+        //Arduino MEGA
         //Pin   Pin Name            Mapped Pin Name       Connected To  Device
         //1     PG5 ( OC0B )        Digital pin 4 (PWM)   CSN           NFR
         //7     PE5 ( OC3C/INT5 )   Digital pin 3 (PWM)   CE            NFR
@@ -345,13 +345,13 @@ typedef struct
 
 typedef struct
 {
-  uint16_t controller1;
+//  uint16_t controller1;
 //  uint16_t controller2;
-//  uint16_t controller3;
+  uint16_t controller3;
   OSLLight lights[12];
 } OSLLightPacket;
 
-volatile OSLLightPacket controller;
+volatile OSLLightPacket packet;
 
 
 // ====================================================================================================================================================>
@@ -445,10 +445,10 @@ void setup()
 
 //setup default controller values
 
-  controller.controller1 = 0;
+  packet.controller3 = 0;
   for (int i=0; i<NumLights; i++)
   {
-      controller.lights[i].state = OFF;                 
+      packet.lights[i].state = OFF;                 
   }
 
   //WIFI
@@ -546,6 +546,7 @@ void loop()
         
         timer.setInterval(BlinkInterval, BlinkLights);          // This will call the function BlinkLights every BlinkInterval milliseconds
         timer.setInterval(FastBlinkInterval, FastBlinkLights);  // This will call the function FastBlinkLights every FastBlinkInterval milliseconds
+        transmissionTimerID = timer.setInterval(transmissionInterval, transmitControllerInfo);
         
         currentMillis = millis();                               // Initializing some variables 
         TransitionStart = currentMillis;  
@@ -561,9 +562,6 @@ void loop()
         MinTurn = (int)((float)MaxRightTurn * 0.2);             // This is the minimum amount of steering wheel movement considered to be a command during Change-Scheme-Mode
         RightCount = 0;
         LeftCount = 0;
-
-        transmissionTimerID = timer.setInterval(transmissionInterval, transmitControllerInfo);
-
         Startup = false;                                        // This ensures the startup stuff only runs once
 
    }

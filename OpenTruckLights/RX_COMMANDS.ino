@@ -96,7 +96,7 @@ int GetMixedSteeringInput()
     }
 
     //update the controller object for sending the data over
-    controller.controller1 = CalculateRearAxlePosition(MixedTurnPulse);  
+    packet.controller3 = CalculateRearAxlePosition(MixedTurnPulse);  
 }  
 
 
