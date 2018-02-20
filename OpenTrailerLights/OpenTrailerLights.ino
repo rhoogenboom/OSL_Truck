@@ -157,18 +157,17 @@ RF24 radio(NFR_CE, NFR_CSN); // NFR CE, CSN connections
 typedef struct
 {
   uint8_t state;
-//  uint8_t function;
 } OSLLight;
 
 typedef struct
 {
-  uint16_t controller1;
+//  uint16_t controller1;
 //  uint16_t controller2;
-//  uint16_t controller3;
+  uint16_t controller3;
   OSLLight lights[12];
 } OSLLightPacket;
 
-volatile OSLLightPacket controller;
+volatile OSLLightPacket packet;
 
 // front servo (3 axles)
 Servo servoFront;   

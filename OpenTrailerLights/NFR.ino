@@ -1,12 +1,13 @@
 void receiveControllerInfo() {
   if (radio.available()) {
-    radio.read(&controller, sizeof(controller));
-    Serial.println(controller.controller1);
+    radio.read(&packet, sizeof(packet));
+    Serial.println(packet.controller3);
   }
+  int servoPosition = packet.controller3;
 
-  if (controller.controller1 != 0) {
-      Serial.println(controller.controller1);
-      updateServoPositions(limitToMaxPositionsServo(controller.controller1));
+  if (servoPosition != 0) {
+      Serial.println(servoPosition);
+      updateServoPositions(limitToMaxPositionsServo(servoPosition));
   }       
   
 }
