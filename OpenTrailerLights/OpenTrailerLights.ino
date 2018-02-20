@@ -113,7 +113,12 @@ int CurrentScheme;                                      // Indicates which schem
 
 int ActualDimLevel;                                             // We allow the user to enter a Dim level from 0-255. Actually, we do not want them using numbers 0 or 1. The ActualDimLevel corrects for this.
                                                                 // In practice, it is unlikely a user would want a dim level of 1 anyway, as it would be probably invisible. 
-int LightPin[NumLights] = {9,10,11,6,7,8,12,13,46,5,17,45};       // These are the Arduino pins to the 8 lights  
+
+//Nano pins:
+//int LightPin[NumLights] = {9,10,11,6,7,8,12,13,46,5,17,45};       // These are the Arduino pins to the lights  
+
+//Mega pins:
+int LightPin[NumLights] = {9,10,11,6,7,8,12,13,46,5,17,45};       // These are the Arduino pins to the lights  
                                                         
 int Dimmable[NumLights] = {1,1,1,1,1,1,1,1,1,1,1,1};            // This indicates which of these pins are capable of ouputting PWM, in order. 
                                                                 // Dimmable must be true in order for the light to be capable of DIM, FADEOFF, or XENON settings

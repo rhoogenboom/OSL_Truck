@@ -334,13 +334,12 @@
 
 //controller structure for NFR transmission
 
-#define transmissionInterval 500  //ms transmission interval
+#define transmissionInterval 100  //ms transmission interval
 unsigned int transmissionTimerID;
 
 typedef struct
 {
   uint8_t state;
-//  uint8_t function;
 } OSLLight;
 
 typedef struct
