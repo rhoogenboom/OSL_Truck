@@ -87,7 +87,7 @@
 // ------------------------------------------------------------------------------------------------------------------------------------------------>
     // How much of a pause is required before changing directions (from forward to reverse or from reverse to forward). 
     // For most ESCs this will be close to zero. 
-    #define TimeToShift_mS             25          // The pause time in milliseconds that will be required before the vehicle is allowed to change direction
+    #define TimeToShift_mS             20          // The pause time in milliseconds that will be required before the vehicle is allowed to change direction
 
 
 // DEADBAND
@@ -95,8 +95,8 @@
     // This reduces the sensitivity around center stick. The numbers can be 0-100 but should be rather small, like 10. This prevents minor movements of your sticks when
     // stopped from  setting off your lights. 
     // Note: if you find you need to set these numbers to high values, what you probably need is to run through Radio Setup instead. 
-    #define ThrottleDeadband            10          // Throttle channel hysteriesis. Values below this will be ignored. Default is 10, number should be small. 
-    #define TurnDeadband                15          // Same thing, but for steering channel. 
+    #define ThrottleDeadband            15          // Throttle channel hysteriesis. Values below this will be ignored. Default is 10, number should be small. 
+    #define TurnDeadband                20          // Same thing, but for steering channel. 
 
 
 // DEBUGGING

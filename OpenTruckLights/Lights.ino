@@ -49,9 +49,9 @@ void SetLights(int DriveMode)
 
         if (LightSettings[j][0] > 0) {
           // should this light be by any of the current channels which are on?
-          if ((LightSettings[j][0] & channelCount) > 0) {
+          if ((LightSettings[j][0] & channelCount) > 0) { //position 0 controls if the light should react to this multiswitch
               //look like so
-              SaveSetting[j] = ON;
+              SaveSetting[j] = ON; //LightSettings[j][1]; //position 1 contains the function we want the light to be at when switch on by multiswitch
           } else {
               //nope, so switch it off, or overrule by drive mode
               SaveSetting[j] = OFF;
