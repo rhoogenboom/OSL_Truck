@@ -33,27 +33,6 @@ void SetLights()
         // We call the function that will set this light to that setting
         SetLight(j, packet.lights[j].state);
     }
-
-    // Now we have done looping through all the lights, and setting them all. 
-
-    // There is an option in UserConfig.h to have the board LEDs reflect car movement, this 
-    // can sometimes be useful for debugging. 
-
-    // If moving forward, green led is on, if moving backwards, red led is on. 
-    // If stopped, both are off.
-    // If braking, both are on. 
-    // If right turn, green LED blinks quickly
-    // If left turn, red LED blinks quickly
-//    if (LED_DEBUG)
-//    {
-//        if (DriveMode == FWD)  { digitalWrite(RedLED , LOW ) ; digitalWrite(GreenLED, HIGH) ; }
-//        if (DriveMode == REV)  { digitalWrite(RedLED , HIGH) ; digitalWrite(GreenLED, LOW ) ; }
-//        if (DriveMode == STOP) { digitalWrite(RedLED , LOW ) ; digitalWrite(GreenLED, LOW ) ; }    
-//        if (Braking == true)   { digitalWrite(RedLED , HIGH) ; digitalWrite(GreenLED, HIGH) ; }
-//        if (TurnCommand > 0)   { GreenBlink(); }    // Right turn
-//        if (TurnCommand < 0)   { RedBlink();   }    // Left turn
-//    }
-
 }
 
 
