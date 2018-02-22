@@ -115,12 +115,13 @@ int ActualDimLevel;                                             // We allow the 
                                                                 // In practice, it is unlikely a user would want a dim level of 1 anyway, as it would be probably invisible. 
 
 //Nano pins:
-//int LightPin[NumLights] = {9,10,11,6,7,8,12,13,46,5,17,45};       // These are the Arduino pins to the lights  
+int LightPin[NumLights] = {2,5,8,9,10,A0,A1,A2,A3,A4,A5,A6};       // These are the Arduino pins to the lights  
+int Dimmable[NumLights] = {0,1,0,1,1,  0, 0, 0, 0, 0, 0, 0};            // This indicates which of these pins are capable of ouputting PWM, in order. 
 
 //Mega pins:
-int LightPin[NumLights] = {9,10,11,6,7,8,12,13,46,5,17,45};       // These are the Arduino pins to the lights  
-                                                        
-int Dimmable[NumLights] = {1,1,1,1,1,1,1,1,1,1,1,1};            // This indicates which of these pins are capable of ouputting PWM, in order. 
+//int LightPin[NumLights] = {9,10,11,6,7,8,12,13,46,5,17,45};       // These are the Arduino pins to the lights  
+//int Dimmable[NumLights] = {1,1,1,1,1,1,1,1,1,1,1,1};            // This indicates which of these pins are capable of ouputting PWM, in order. 
+
                                                                 // Dimmable must be true in order for the light to be capable of DIM, FADEOFF, or XENON settings
 int LightSettings[NumLights][NumStates];                        // An array to hold the settings for each state for each light. 
 int PriorLightSetting[NumLights][NumStates];                    // Sometimes we want to temporarily change the setting for a light. We can store the prior setting here, and revert back to it when the temporary change is over.
@@ -161,7 +162,7 @@ RF24 radio(NFR_CE, NFR_CSN); // NFR CE, CSN connections
 
 typedef struct
 {
-  uint8_t state;
+  int8_t state;
 } OSLLight;
 
 typedef struct
@@ -198,14 +199,15 @@ void setup()
 {
   Serial.begin(BaudRate);  
 
-//  for (int i=0; i<NumLights; i++)                             
-//  {
-//      pinMode(LightPin[i], OUTPUT);                       // Set all the external light pins to outputs
-//      TurnOffLight(i);                                    // Start with all lights off                        
-//  }
+  for (int i=0; i<NumLights; i++)                             
+  {
+      packet.lights[i].state = OFF;
+      pinMode(LightPin[i], OUTPUT);                       // Set all the external light pins to outputs
+      TurnOffLight(i);                                    // Start with all lights off                        
+  }
 
-//  SetupLights(CurrentScheme);                             // Set the lights to the Scheme last saved in EEPROM
-//  FixDimLevel();                                          // Takes care of a bug that only occurs if a user sets the Dim level to 1 (unlikely)
+  SetupLights(CurrentScheme);                             // Set the lights to the Scheme last saved in EEPROM
+  FixDimLevel();                                          // Takes care of a bug that only occurs if a user sets the Dim level to 1 (unlikely)
 
   // first steering servo at the front
   servoFront.attach(SERVO_VOOR_PIN);  
@@ -229,16 +231,14 @@ void setup()
 
 void loop()
 {
-//  static boolean WhatState = true;
-//  
-//  if (Startup)
-//  {       
-//      if (DEBUG) { DumpControllerValues(); }
-//      timer.setInterval(BlinkInterval, BlinkLights);
-//      timer.setInterval(FastBlinkInterval, FastBlinkLights);
-//      Startup = false;
-//  }
-//  timer.run();
+  if (Startup)
+  {       
+//      if (DEBUG) { DumpConfiguration(); }  //todo - dump current configuration to serial
+      timer.setInterval(BlinkInterval, BlinkLights);
+      timer.setInterval(FastBlinkInterval, FastBlinkLights);
+      Startup = false;
+  }
+  timer.run();
   
   receiveControllerInfo();
 } 
