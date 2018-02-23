@@ -75,18 +75,34 @@
         //     Pos 1      Pos 2      Pos 3      Pos 4       Pos 5     Forward     Reverse     Stop      StopDelay   Brake     Right Turn     Left Turn      Accelerating   Decelerating
         // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-{0,OFF,OFF,ON,OFF,ON,NA,NA,NA,ON},  // light 1 - Brake
-{0,NA,BLINK,OFF,BLINK,NA,BLINK,NA,NA,NA}, // light 2 - Right Turn
-{0,NA,BLINK,OFF,BLINK,NA,NA,BLINK,NA,NA}, // light 3 - Left Turn
-{0,OFF,ON,OFF,OFF,NA,NA,NA,NA,NA},  // light 4 - Reverse
-{128,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 5 - Headlight 1
-{64,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 6 - Headlight 2
-{32,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 7 - Low Fog Front
-{16,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 8 - High Fog Front
-{8,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 9  - Rear Fog
-{4,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 10  - Emergency
-{2,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 11 - Emergency Trailer
-{1,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 12 - Extra lights 1
+//old:
+//{0,OFF,OFF,ON,OFF,ON,NA,NA,NA,ON},  // light 1 - Brake
+//{0,NA,BLINK,OFF,BLINK,NA,BLINK,NA,NA,NA}, // light 2 - Right Turn
+//{0,NA,BLINK,OFF,BLINK,NA,NA,BLINK,NA,NA}, // light 3 - Left Turn
+//{0,OFF,ON,OFF,OFF,NA,NA,NA,NA,NA},  // light 4 - Reverse
+//{128,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 5 - Headlight 1
+//{64,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 6 - Headlight 2
+//{32,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 7 - Low Fog Front
+//{16,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 8 - High Fog Front
+//{8,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 9  - Rear Fog
+//{4,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 10  - Emergency
+//{2,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 11 - Emergency Trailer
+//{1,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 12 - Extra lights 1
+
+//multifuction:
+{0,NA,OFF,OFF,ON,OFF,ON,NA,NA,NA,ON},  // light 1 - Brake  // light 1  9
+{0,NA,NA,BLINK,OFF,BLINK,NA,BLINK,NA,NA,NA},  // light 2 - Right Turn // light 2  10
+{0,NA,NA,BLINK,OFF,BLINK,NA,NA,BLINK,NA,NA},  // light 3 - Left Turn  // light 3  11
+{0,NA,OFF,ON,OFF,OFF,NA,NA,NA,NA,NA}, // light 4 - Reverse  // light 4  6
+{128,XENON,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 5 - Headlight 1  // light 5  7
+{64,XENON,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 6 - Headlight 2  // light 6  8
+{32,ON,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 7 - Low Fog Front  // light 7  12
+{16,ON,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 8 - High Fog Front // light 8  13
+{8,ON,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 9  - Rear Fog  // light 9  46
+{4,FASTBLINK,NA,NA,NA,NA,NA,NA,NA,NA,NA}, // light 10  - Emergency  // light 10   5
+{2,ON,NA,NA,NA,NA,NA,NA,NA,NA,NA},  // light 11 - Emergency Trailer // light 11 17
+{1,ON,NA,NA,NA,NA,NA,NA,NA,NA,NA} // light 12 - Extra lights 1  // light 12 45
+
 
 }
     };
