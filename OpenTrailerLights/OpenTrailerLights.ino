@@ -201,6 +201,7 @@ void setup()
 
   for (int i=0; i<NumLights; i++)                             
   {
+      packet.controller3 = 1500;
       packet.lights[i].state = OFF;
       pinMode(LightPin[i], OUTPUT);                       // Set all the external light pins to outputs
       TurnOffLight(i);                                    // Start with all lights off                        
@@ -217,7 +218,7 @@ void setup()
   updateServoPositions(1500);
 
   radio.begin();
-  radio.setPALevel(RF24_PA_MIN); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
+  radio.setPALevel(RF24_PA_LOW); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
   radio.setDataRate(RF24_2MBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS  
   radio.openReadingPipe(0, address);
   radio.startListening();
