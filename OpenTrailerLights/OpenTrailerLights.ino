@@ -199,9 +199,10 @@ void setup()
 {
   Serial.begin(BaudRate);  
 
+  packet.controller3 = 1500;
+
   for (int i=0; i<NumLights; i++)                             
   {
-      packet.controller3 = 1500;
       packet.lights[i].state = OFF;
       pinMode(LightPin[i], OUTPUT);                       // Set all the external light pins to outputs
       TurnOffLight(i);                                    // Start with all lights off                        
