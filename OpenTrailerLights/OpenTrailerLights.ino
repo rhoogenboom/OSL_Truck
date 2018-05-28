@@ -116,7 +116,7 @@ int ActualDimLevel;                                             // We allow the 
 
 //Nano pins:
 int LightPin[NumLights] = {2,5,8,9,10,A0,A1,A2,A3,A4,A5,A6};       // These are the Arduino pins to the lights  
-int Dimmable[NumLights] = {0,1,0,1,1,  0, 0, 0, 0, 0, 0, 0};            // This indicates which of these pins are capable of ouputting PWM, in order. 
+int Dimmable[NumLights] = {0,0,0,0,0,  0, 0, 0, 0, 0, 0, 0};            // This indicates which of these pins are capable of ouputting PWM, in order. 
 
 //Mega pins:
 //int LightPin[NumLights] = {9,10,11,6,7,8,12,13,46,5,17,45};       // These are the Arduino pins to the lights  
