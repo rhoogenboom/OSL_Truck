@@ -8,7 +8,7 @@ void receiveControllerInfo() {
     } 
 
     SetLights();
-  printPacketContents();  
+  //printPacketContents();  
   }
 }
 
