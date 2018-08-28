@@ -223,22 +223,22 @@
                                                                 // Note that the actual schemes are zero-based (0 to NumSchemes-1) but don't worry about that,
                                                                 // the code takes care of it. 
         #define NumLights                    12                 // The number of light outputs available on the board
-        #define NumStates                    10                 // There are 10 possible states a light can be by: 
+        #define NumStates                    11                 // There are 10 possible states a light can be by: 
                                                                 // - Set through 1 or more switches on the multiprop channel, 
                                                                 // - Forward, Reverse, Stop, Stop Delay, Brake (from Throttle Channel), 
                                                                 // - Right Turn, Left Turn (from Turn Channel)
                                                                 // - Accelerating - 
                                                                 // - Decelerating - special state that occurs on heavy deceleration (from Throttle Channel)
 
-        const byte StateFwd            =    1; //5;                 // Moving forward
-        const byte StateRev            =    2; //6;                 // Moving backwards
-        const byte StateStop           =    3; //7;                 // Stopped
-        const byte StateStopDelay      =    4; //8;                 // Stopped for a user-defined length of time
-        const byte StateBrake          =    5; //9;                 // Braking
-        const byte StateRT             =    6; //10;                // Right turn
-        const byte StateLT             =    7; //11;                // Left turn
-        const byte StateAccel          =    8; //12;                // Acceleration
-        const byte StateDecel          =    9; //13;                // Deceleration
+        const byte StateFwd            =    2; //5;                 // Moving forward
+        const byte StateRev            =    3; //6;                 // Moving backwards
+        const byte StateStop           =    4; //7;                 // Stopped
+        const byte StateStopDelay      =    5; //8;                 // Stopped for a user-defined length of time
+        const byte StateBrake          =    6; //9;                 // Braking
+        const byte StateRT             =    7; //10;                // Right turn
+        const byte StateLT             =    8; //11;                // Left turn
+        const byte StateAccel          =    9; //12;                // Acceleration
+        const byte StateDecel          =    10; //13;                // Deceleration
        
         int ActualDimLevel;                                             // We allow the user to enter a Dim level from 0-255. Actually, we do not want them using numbers 0 or 1. The ActualDimLevel corrects for this.
                                                                         // In practice, it is unlikely a user would want a dim level of 1 anyway, as it would be probably invisible. 
@@ -452,7 +452,7 @@ void setup()
 
   //WIFI
   radio.begin();
-  radio.setPALevel(RF24_PA_MIN); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
+  radio.setPALevel(RF24_PA_LOW); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
   radio.setDataRate(RF24_2MBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS
   radio.openWritingPipe(address);
   radio.stopListening();

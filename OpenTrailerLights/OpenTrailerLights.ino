@@ -116,7 +116,7 @@ int ActualDimLevel;                                             // We allow the 
 
 //Nano pins:
 int LightPin[NumLights] = {2,5,8,9,10,A0,A1,A2,A3,A4,A5,A6};       // These are the Arduino pins to the lights  
-int Dimmable[NumLights] = {0,1,0,1,1,  0, 0, 0, 0, 0, 0, 0};            // This indicates which of these pins are capable of ouputting PWM, in order. 
+int Dimmable[NumLights] = {0,0,0,0,0,  0, 0, 0, 0, 0, 0, 0};            // This indicates which of these pins are capable of ouputting PWM, in order. 
 
 //Mega pins:
 //int LightPin[NumLights] = {9,10,11,6,7,8,12,13,46,5,17,45};       // These are the Arduino pins to the lights  
@@ -199,6 +199,8 @@ void setup()
 {
   Serial.begin(BaudRate);  
 
+  packet.controller3 = 1500;
+
   for (int i=0; i<NumLights; i++)                             
   {
       packet.lights[i].state = OFF;
@@ -217,7 +219,7 @@ void setup()
   updateServoPositions(1500);
 
   radio.begin();
-  radio.setPALevel(RF24_PA_MIN); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
+  radio.setPALevel(RF24_PA_LOW); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
   radio.setDataRate(RF24_2MBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS  
   radio.openReadingPipe(0, address);
   radio.startListening();
