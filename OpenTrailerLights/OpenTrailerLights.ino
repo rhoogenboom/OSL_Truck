@@ -151,7 +151,6 @@ const byte address[6] = {0x66,0x68,0x7b,0x4a,0x63};
 
 RF24 radio(NFR_CE, NFR_CSN); // NFR CE, CSN connections
 //NFR pin connections:
-//Arduino
 //Pin   Pin Name            Mapped  Pin   Name       Connected To  On Device
 //1     PG5 ( OC0B )        Digital pin 4 (PWM)       CSN           NFR
 //7     PE5 ( OC3C/INT5 )   Digital pin 3 (PWM)       CE            NFR
@@ -186,8 +185,6 @@ Servo servoRear;
 //                      Digital pin 7           Signal (Orange)  Servo
 //                      GND                     Ground  (Brown)   Servo
 //                                              PWR     (Red)     Servo
-
-
 
 bool startFound = false;
 bool endFound = false;

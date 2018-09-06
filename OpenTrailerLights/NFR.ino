@@ -7,7 +7,7 @@ void receiveControllerInfo() {
         updateServoPositions(limitToMaxPositionsServo(servoPosition));
     } 
 
-    SetLights();
+  //SetLights();
   //printPacketContents();  
   }
 }
