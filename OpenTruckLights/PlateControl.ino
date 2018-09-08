@@ -1,26 +1,18 @@
-//limits the range which we consider the full movement between truck and trailer angle, either left of right
-int limitToMaxPositionsOnPlate(int input) {
-  //if input is smaller than the minimum we would accept, we update to minimum
-  if (input < potMaxPositionLeft) {
-    input = potMaxPositionLeft;
-  }
-  //if input is larger than the maximum we would accept, we update to maximum
-  if (input > potMaxPositionRight) {
-    input = potMaxPositionRight;
-  }
-  return input;
-}
-
 //check if input is within allowed range, if not, then receiver might be disconnected so we just return the middle
 int limitToMaxPositionsFromReceiver(int input) {
   if (input == 0 || input < MIN_CHANNEL || input > MAX_CHANNEL) {
-    return map(MixSteering_PulseCenter, MIN_CHANNEL, MAX_CHANNEL, minValueMeasuredForPot, maxValueMeasuredForPot);
+    return MixSteering_PulseCenter;
   } else {
     //TODO fix so we can use full stick range but still link to plate range for movement
     
     //below limits the receiver input range to the pot range so we can we can subtract or add them together
-    return map(input, MIN_CHANNEL, MAX_CHANNEL, minValueMeasuredForPot, maxValueMeasuredForPot);
+    return input;
   }
+}
+
+//translate the potmeter input to the same values as the receiver input so they can be easily subtracted from each other.
+int convertPotmeterToReceiverValues(int input) {
+  return map(input, minValueMeasuredForPot, maxValueMeasuredForPot, MIN_CHANNEL, MAX_CHANNEL);
 }
 
 //Mix the manual steering from receiver with the pot input and come to final angle for wheels
@@ -42,19 +34,15 @@ int mixPlateAndReceiverInput(int receiver, int potmeter) {
 
 int CalculateRearAxlePosition(int receiver) {
   // reads the value of the potentiometer
-  int analogPotmeterInput = analogRead(PotMeter_Pin); //input: 0-1024 
-  int potInput = analogPotmeterInput;
+  int potInput = analogRead(PotMeter_Pin); //input: 0-1024 
+  int analogPotmeterInput = convertPotmeterToReceiverValues(potInput); //input range: 0-1023 limit: 875-2125
 
-   //translate the receiver input to the same range of the pot input
-  int analogReceiverInput = limitToMaxPositionsFromReceiver(receiver); //input range: 875-2125 limit: 0-1024
+   //validat input from receiver
+  int analogReceiverInput = limitToMaxPositionsFromReceiver(receiver); //input range: 875-2125 limit: 875-2125
+  
   //mix the receiver and the pot together but only when the sticks are out of center
-  analogPotmeterInput = mixPlateAndReceiverInput(analogReceiverInput, analogPotmeterInput); //input: 0-1024 / 0-1024; 
+  int resultingSteering = mixPlateAndReceiverInput(analogReceiverInput, analogPotmeterInput); //input: 875-2125 / 875-2125; 
 
-  // limit the pot values to what we expect them to be max left and right
-  analogPotmeterInput = limitToMaxPositionsOnPlate(analogPotmeterInput);
-
-  // translate plate position to relative position between max left and right
-  int positionPotmeter = map(analogPotmeterInput, potMaxPositionLeft, potMaxPositionRight, minValueMeasuredForPot, maxValueMeasuredForPot);
   if (DEBUG_INPUT) {
     Serial.print(F("Potmeter Input"));
     Serial.print(F("   "));
@@ -62,16 +50,20 @@ int CalculateRearAxlePosition(int receiver) {
     Serial.print(F("   "));
     Serial.print(F("Steering Input"));
     Serial.print(F("   "));
+    Serial.print(F("Steering Result"));
+    Serial.print(F("   "));
     Serial.println(F("Trailer steering"));
     Serial.print(potInput); 
     Serial.print(F("             "));
     Serial.print(analogPotmeterInput); 
     Serial.print(F("                  "));
     Serial.print(analogReceiverInput); 
+    Serial.print(F("                  "));
+    Serial.print(resultingSteering); 
     Serial.print(F("               "));
-    Serial.println(map(positionPotmeter, 0, maxValueMeasuredForPot, maxPositionLeftFrontServo, maxPositionRightFrontServo)); 
+    Serial.println(map(resultingSteering, MIN_CHANNEL, MAX_CHANNEL, maxPositionLeftFrontServo, maxPositionRightFrontServo)); 
     delay(1000);
   }
-  return map(positionPotmeter, 0, maxValueMeasuredForPot, maxPositionLeftFrontServo, maxPositionRightFrontServo);
+  return map(resultingSteering, MIN_CHANNEL, MAX_CHANNEL, maxPositionLeftFrontServo, maxPositionRightFrontServo);
 }
 
