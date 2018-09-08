@@ -27,7 +27,7 @@
 #define maxValueMeasuredForPot 1023
 
 //overruled the middle position of maxValueMeasuredForPot divided by two 2 due to the magnetic center
-#define potMiddlePosition 514
+#define potMiddlePosition 511
 
 //Limit the pot input up to this minimal value
 #define potMaxPositionLeft 350 

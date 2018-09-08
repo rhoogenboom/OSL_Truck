@@ -43,36 +43,32 @@ int mixPlateAndReceiverInput(int receiver, int potmeter) {
 int CalculateRearAxlePosition(int receiver) {
   // reads the value of the potentiometer
   int analogPotmeterInput = analogRead(PotMeter_Pin); //input: 0-1024 
+  int potInput = analogPotmeterInput;
 
-  Serial.println(analogPotmeterInput);
-  
    //translate the receiver input to the same range of the pot input
   int analogReceiverInput = limitToMaxPositionsFromReceiver(receiver); //input range: 875-2125 limit: 0-1024
-
-  Serial.println(analogReceiverInput);
-  
   //mix the receiver and the pot together but only when the sticks are out of center
   analogPotmeterInput = mixPlateAndReceiverInput(analogReceiverInput, analogPotmeterInput); //input: 0-1024 / 0-1024; 
 
-  Serial.println(analogPotmeterInput);
-  
   // limit the pot values to what we expect them to be max left and right
   analogPotmeterInput = limitToMaxPositionsOnPlate(analogPotmeterInput);
 
-  Serial.println(analogPotmeterInput);
-  
   // translate plate position to relative position between max left and right
   int positionPotmeter = map(analogPotmeterInput, potMaxPositionLeft, potMaxPositionRight, minValueMeasuredForPot, maxValueMeasuredForPot);
   if (DEBUG_INPUT) {
-    Serial.print(F("Potmeter"));
+    Serial.print(F("Potmeter Input"));
     Serial.print(F("   "));
-    Serial.print(F("SteeringChannel"));
+    Serial.print(F("Potmeter Converted"));
     Serial.print(F("   "));
-    Serial.println(F("Steering"));
+    Serial.print(F("Steering Input"));
+    Serial.print(F("   "));
+    Serial.println(F("Trailer steering"));
+    Serial.print(potInput); 
+    Serial.print(F("             "));
     Serial.print(analogPotmeterInput); 
-    Serial.print(F("   "));
+    Serial.print(F("                  "));
     Serial.print(analogReceiverInput); 
-    Serial.print(F("   "));
+    Serial.print(F("               "));
     Serial.println(map(positionPotmeter, 0, maxValueMeasuredForPot, maxPositionLeftFrontServo, maxPositionRightFrontServo)); 
     delay(1000);
   }
