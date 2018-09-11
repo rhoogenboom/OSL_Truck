@@ -7,7 +7,7 @@
 #define servoMaxPulse 1800
 
 //ms transmission interval
-#define transmissionInterval 500  
+#define transmissionInterval 100  
 
 // Set baud rate here if you know what you're doing and don't like the default value
 #define BaudRate 9600// 38400          
@@ -22,8 +22,8 @@
 #define CHANNEL_DEADCENTER 25
 
 //Minimum and maximum valid inputs for mix steering channel
-#define MIN_CHANNEL 875
-#define MAX_CHANNEL 2125
+#define MIN_CHANNEL 890
+#define MAX_CHANNEL 2110
 #define MixSteering_PulseCenter 1500 //1472
 
 //Minimum and maximum valid inputs for potmeter
