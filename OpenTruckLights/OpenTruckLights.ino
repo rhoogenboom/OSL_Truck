@@ -7,7 +7,7 @@
 #include <RF24.h>
 
 //receiver items and model inputs
-const byte MixSteeringChannel_Pin = 18;      // steering channel for mixing the rear axles - Mega:D18/pin46 - Nano: D2/
+const byte MixSteeringChannel_Pin = 2;      // steering channel for mixing the rear axles - Mega:D18/pin46 - Nano: D2/
 const byte PotMeter_Pin = A7;                // 5th wheel Mega: A1/pin96 - Nano: A7/
 const byte NFR_CE  = 3;                      // NFR CE pin D3/pin7
 const byte NFR_CSN = 4;                      // NFR CSN pin D4/pin1
