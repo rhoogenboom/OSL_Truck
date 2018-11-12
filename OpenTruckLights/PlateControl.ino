@@ -3,11 +3,6 @@ const int CHANNEL_DEADCENTER = 10;
 const int MIN_CHANNEL = 875;
 const int MAX_CHANNEL = 2125;
 
-int deadCentreWidth = 2;
-int potDeviation = 25;
-
-int previousPlatePosition;
-
 const int minValueMeasuredForPot = 0;
 const int maxValueMeasuredForPot = 1023;
 int potMiddlePosition = 514; //overruled the middle position of maxValueMeasuredForPot divided by two 2 due to the magnetic center
