@@ -334,7 +334,7 @@
 
 //controller structure for NFR transmission
 
-#define transmissionInterval 100  //ms transmission interval
+#define transmissionInterval 50  //ms transmission interval
 unsigned int transmissionTimerID;
 
 typedef struct
@@ -452,7 +452,7 @@ void setup()
 
   //WIFI
   radio.begin();
-  radio.setPALevel(RF24_PA_LOW); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
+  radio.setPALevel(RF24_PA_HIGH); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
   radio.setDataRate(RF24_2MBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS
   radio.openWritingPipe(address);
   radio.stopListening();
