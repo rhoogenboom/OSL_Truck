@@ -5,6 +5,8 @@ void GetRxCommands()
 
 int GetMixedSteeringInput()
 {
+    int MixedTurnPulse;
+    
     //read the input from the RC receiver overruling the 5th wheel position
     if (INTERUPT_IO) {
       MixedTurnPulse = pulse_time;

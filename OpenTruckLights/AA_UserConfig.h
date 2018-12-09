@@ -3,8 +3,8 @@
 #define DEBUG_OUTPUT false         
 
 //Limit the steering servos to these maximum values for left and right
-#define servoMinPulse 1200
-#define servoMaxPulse 1800
+//#define servoMinPulse 1200
+//#define servoMaxPulse 1800
 
 //ms transmission interval
 #define transmissionInterval 100  

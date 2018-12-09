@@ -27,5 +27,17 @@
 #define MAGNET_LEFT_LED_RED 9
 #define MAGNET_RIGHT_LED_GREEN 10
 
-#define POWER_5V 2
+//receiver items and model inputs
+#define MixSteeringChannel_Pin 2 // steering channel for mixing the rear axles - Mega:D18/pin46 - Nano: D2/
+#define PotMeter_Pin A7 // 5th wheel Mega: A1/pin96 - Nano: A7/
+
+#define POWER_5V 2 //TODO figure out other pin used by lights
+
+//light unit
+
+// The number of light outputs available on the board
+#define NumLights                    12                 
+
+//receiver 
+#define ServoTimeout 35000 // Value in microseconds (uS) - length of time to wait for a servo pulse.
 

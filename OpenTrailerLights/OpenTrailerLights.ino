@@ -1,59 +1,6 @@
- /*
- * Open Trailer Lights - Truck  
- * An Arduino-based program to control LED lights and servos on RC utility vehicles and via wifi their trailer. 
- * Last Updated:        06/01/2018 - rhoogenboom
- *  
- * GitHub Repository OSL_Truck:
- * https://github.com/rhoogenboom/OSL_Truck
- *
- *
- * Version history
- * 6 Jan 2018 - v1.0 - initial project initialization
- * 
- * 
- *
- * For more information on OSL, see the RCGroups thread: 
- * http://www.rcgroups.com/forums/showthread.php?t=1539753
- * 
- * GitHub Repository OSL_Original:
- * https://github.com/OSRCL/OSL_Original
- * 
- *
- * To compile select               Tools -> Board     -> Arduino Nano
- * Also select correct processor   Tools -> Processor -> ATmega328 (P)
- *
- *
- * CREDITS!    CREDITS!    CREDITS!
- *----------------------------------------------------------------------------------------------------------------------------------------------------->
- * Several people have contributed code to this project
- * 
- *  taken from OSL_Original 2.10 by Luke Middleton
- *
- * Richard & Nick       RCGroups username "Rbhoogenboom" and "NickSegers"
- *                          June 2016 - created an Excel file to simplify the light setups. It will automatically generate the entire AA_LIGHT_SETUP file. 
- *                          Download from the first post of the thread linked above. 
- * Sergio Pizzotti      RCGroups username "wormch"
- *                          March 2015 - Made several impressive changes specifically for drift cars. Wrote all the code related to the backfiring and Xenon effects. 
- *                          Made ChangeSchemeMode more user-friendly, it can only be entered after the car has been stopped several seconds. 
- *                          Also fixed some bugs and taught me the F() macro!
- * Patrik               RCGroups username "Orque"
- *                          March 2015 - Expanded the Channel 3 functionality to read up to a 5 position switch (previously only worked to 3 positions)        
- * Jens                 RCGroups username "learningarduino"
- *                          October 2014 - Fixed bugs related to pin initialization and debug printing. 
- * Peter                RCGroups username "4x4_RC_Pit"
- *                          September 2014 - Fixed several bugs in the RadioSetup routine. Also the first person to post a video of OSL in action.
- * JChristensen         We are using Christensen's button library unchanged. It has been renamed from Button to OSL_Button simply because there are many Arduino
- *                      button libraries, and we don't want the install of this one to conflict with others you may already have. See JChristensen's project page here:
- *                      https://github.com/JChristensen/Button
- *
- * Open Source Lights is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License v3 as published by
- * the Free Software Foundation (http://www.gnu.org/licenses/)
- *
-*/
-
 #include "AA_UserConfig.h"
 #include "Defines.h"
+#include "Variables.h"
 #include <OSL_SimpleTimer.h>
 #include <EEPROM.h>
 #include <avr/eeprom.h>
@@ -61,26 +8,10 @@
 
 #include <Servo.h>
 
-//#include <OSLController.h>
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 
-const byte NFR_CE              =    3;                       // The Arduino pin connected to the NFR CE pin D3/pin7
-const byte NFR_CSN             =    4;                       // The Arduino pin connected to the NFR CSN pin D4/pin1
-
-/*
- * NFR wiring
- * VCC - 3.3v!!!!
- * GND - GND
- * CSN / CE see above
- * Nano:
- * SCK - pin 13
- * MOSI - pin 11
- * MISO = pin 12
- * 
- * 
- */
 
 int SERVO_VOOR_PIN = 6;        //Arduino nano pin to which the servo is attached D48/pin36
 int SERVO_ACHTER_PIN = 7;      //Arduino pin to which the servo is attached D49/pin35
@@ -186,11 +117,8 @@ Servo servoRear;
 //                      GND                     Ground  (Brown)   Servo
 //                                              PWR     (Red)     Servo
 
-bool startFound = false;
-bool endFound = false;
-
-const int servoMinPulse = 1200;
-const int servoMaxPulse = 1800;
+//const int servoMinPulse = 1200;
+//const int servoMaxPulse = 1800;
 
 void setup()
 {
@@ -216,8 +144,8 @@ void setup()
   updateServoPositions(1500);
 
   radio.begin();
-  radio.setPALevel(RF24_PA_LOW); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
-  radio.setDataRate(RF24_2MBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS  
+  radio.setPALevel(RF24_PA_HIGH); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
+  radio.setDataRate(RF24_1MBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS  
   radio.openReadingPipe(0, address);
   radio.startListening();
 }
