@@ -1,14 +1,14 @@
-//RHO TODO
 #include "AA_UserConfig.h"
 #include "Defines.h"
 #include "Variables.h"
 #include <OSL_SimpleTimer.h>
+
 #include <PinChangeInterrupt.h>
+
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 
-//objects
 // Timer object for transmission of signal to trailer
 OSL_SimpleTimer timer;                 
        
@@ -41,10 +41,15 @@ volatile OSLLightPacket packet;
 void setup()
 {
   Serial.begin(BaudRate);  
+    
+  //Initialize_EEPROM();
 
   // initialize setup button
   buttonState = 0;
   pinMode(SETUP_BUTTON, INPUT);
+  // set one pin to high to provide 5v for the magnet and servo pot meter and to read the setup button
+  pinMode(POWER_5V, OUTPUT);
+  digitalWrite(POWER_5V, HIGH);
 
   long Temp;
   // Get EEPROM Initialization value
@@ -89,10 +94,6 @@ void setup()
   if (buttonState == HIGH) {
     Serial.println("Setup button pressed, setup mode active");
 
-    // set one pin to high to provide 5v for the magnet and servo pot meter
-    pinMode(POWER_5V, OUTPUT);
-    digitalWrite(POWER_5V, HIGH);
-    
     SetupMode();
     ReadPotMeters();
     setupActive = true;
@@ -104,8 +105,8 @@ void setup()
 
   //WIFI
   radio.begin();
-  radio.setPALevel(RF24_PA_HIGH); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
-  radio.setDataRate(RF24_1MBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS
+  radio.setPALevel(RF24_PA_MIN); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
+  radio.setDataRate(RF24_250KBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS
   radio.openWritingPipe(address);
   radio.stopListening();
 }
@@ -120,14 +121,38 @@ void loop()
   //RUN ONCE
   if (Startup)
   {       
-      transmissionTimerID = timer.setInterval(transmissionInterval, transmitControllerInfo);
-      Startup = false;                                        
+//      transmissionTimerID = timer.setInterval(transmissionInterval, transmitControllerInfo);
+      Startup = false;           
   }
 
   //ETERNAL LOOP
 
   timer.run();
-      
+
   GetRxCommands();
+
+  // if we are in setup mode, read the setup button
+  if (setupActive == true) {
+    // check setup pin
+    buttonState = digitalRead(SETUP_BUTTON);
+
+    // if the button is pressed, we want to read new pot values and store them in EEPROM
+    if (buttonState == HIGH) {
+      Serial.println("Setup button pressed, update mode");
+      ReadPotMeters();
+ 
+      Serial.println("Write updated params to eeprom");
+      Write_EEPROM();      
+
+      //send servo EEPROM value over to trailer
+      packet.updateEeprom = true;
+    }
+  }
+
+  //set magnet LEDs only when we are in setup mode
+  if (setupActive == true) {
+    SetMagnetLEDs(potInput);
+  }
+  
 } 
 

@@ -13,8 +13,6 @@ int GetMixedSteeringInput()
     } else {
       MixedTurnPulse = pulseIn(MixSteeringChannel_Pin, HIGH, ServoTimeout);
     }
-
-//    Serial.println(MixedTurnPulse);
     
     //update the controller object for sending the data over
     packet.controller3 = CalculateRearAxlePosition(MixedTurnPulse);  

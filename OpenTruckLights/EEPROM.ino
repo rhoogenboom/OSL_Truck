@@ -3,10 +3,10 @@ void Initialize_EEPROM()
   // The first time a radio setup is performed, these will be overwritten with actual values, and never referred to agian.
   // Because the  radio setup is the first thing a user should do, these in fact should not come into play.
   int servoMinPulse = 1200;
-  int potMaxPositionLeft = 350;
+  int minValueMeasuredForPot = 350;
 
   eeprom_write(servoMinPulse, E_servoMinPulse);
-  eeprom_write(potMaxPositionLeft, E_potMaxPositionLeft);
+  eeprom_write(minValueMeasuredForPot, E_minValueMeasuredForPot);
 
   // This is our initialization constant
   eeprom_write(EEPROM_Init, E_InitNum);
@@ -19,18 +19,20 @@ void Initialize_EEPROM()
 void Load_EEPROM()
 {
   eeprom_read(servoMinPulse, E_servoMinPulse);
-  eeprom_read(potMaxPositionLeft, E_potMaxPositionLeft);
+  eeprom_read(minValueMeasuredForPot, E_minValueMeasuredForPot);
+
+  maxValueMeasuredForPot = potMiddlePosition + (potMiddlePosition - minValueMeasuredForPot);
+  servoMaxPulse = SERVO_MIDDLE_POSITION + (SERVO_MIDDLE_POSITION - servoMinPulse);
 
   Serial.print("Servo min pulse: "); Serial.println(servoMinPulse);
-  Serial.print("Pot max pos left: "); Serial.println(potMaxPositionLeft);
-  
-  potMaxPositionRight = potMiddlePosition + (potMiddlePosition - potMaxPositionLeft);
-  servoMaxPulse = SERVO_MIDDLE_POSITION + (SERVO_MIDDLE_POSITION - servoMinPulse);
+  Serial.print("Servo max pulse: "); Serial.println(servoMaxPulse);
+  Serial.print("Pot max pos left: "); Serial.println(minValueMeasuredForPot);
+  Serial.print("Pot max pos left: "); Serial.println(maxValueMeasuredForPot);
 }
 
 void Write_EEPROM() {
   eeprom_write(servoMinPulse, E_servoMinPulse);
-  eeprom_write(potMaxPositionLeft, E_potMaxPositionLeft);
+  eeprom_write(minValueMeasuredForPot, E_minValueMeasuredForPot);
 
   // This is our initialization constant
   eeprom_write(1, E_InitNum);

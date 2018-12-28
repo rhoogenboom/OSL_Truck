@@ -8,30 +8,32 @@
 #define MIN(x,y) ( x > y ? y : x )
 #define MAX(x,y) ( x > y ? x : y )
 
-#define MIN_CHANNEL 875 //max left of RC controller
-#define MAX_CHANNEL 2125 //max right of RC controller
-#define CHANNEL_DEADCENTER 10
+#define MIN_CHANNEL 875 //890 //max left of RC controller
+#define MAX_CHANNEL 2125 //2110 //max right of RC controller
+#define CHANNEL_DEADCENTER 10 //25
 
 #define SERVO_MIN_POSITION 1000
-#define SERVO_MAX_POSITION 1500  //TODO should this be 1500? not 2000???
 #define SERVO_MIDDLE_POSITION 1500
 
-#define MIN_VALUE_MEASURED_FOR_POT 0
-#define MAX_VALUE_MEASURED_FOR_POT 1024
-#define CHANNEL_CENTER 512 //middle of pot meter
+//Middle point of the mix steering channel 
+#define RC_CHANNEL_CENTER 1500
+
+#define MixSteering_PulseCenter 1500 
+
+//Middle of the pot/hall sensor input
+#define HALL_CENTER 512 //middle of pot meter
 
 //setup pins and lights
-#define SETUP_BUTTON A0 //nano: 20
-#define MAGNET_POT 8 
-#define SERVO_POT 5
+#define SETUP_BUTTON A0
+#define MAGNET_POT A5
+#define SERVO_POT A6
 #define MAGNET_LEFT_LED_RED 9
 #define MAGNET_RIGHT_LED_GREEN 10
+#define POWER_5V 2 
 
 //receiver items and model inputs
 #define MixSteeringChannel_Pin 2 // steering channel for mixing the rear axles - Mega:D18/pin46 - Nano: D2/
 #define PotMeter_Pin A7 // 5th wheel Mega: A1/pin96 - Nano: A7/
-
-#define POWER_5V 2 //TODO figure out other pin used by lights
 
 //light unit
 
