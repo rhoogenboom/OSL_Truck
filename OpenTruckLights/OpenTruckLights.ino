@@ -121,7 +121,7 @@ void loop()
   //RUN ONCE
   if (Startup)
   {       
-//      transmissionTimerID = timer.setInterval(transmissionInterval, transmitControllerInfo);
+      transmissionTimerID = timer.setInterval(transmissionInterval, transmitControllerInfo);
       Startup = false;           
   }
 

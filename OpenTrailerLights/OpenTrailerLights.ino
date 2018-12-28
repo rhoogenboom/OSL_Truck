@@ -2,9 +2,6 @@
 #include "Defines.h"
 #include "Variables.h"
 #include <OSL_SimpleTimer.h>
-#include <EEPROM.h>
-#include <avr/eeprom.h>
-#include <avr/pgmspace.h>
 
 #include <Servo.h>
 
@@ -78,8 +75,6 @@ static boolean State;                                   // If blinking, are they
 static boolean PriorState;                              // Blinking state in the prior iteration
 static int TimesBlinked;                                // How many times have the lights blinked
 
-const byte address[6] = {0x66,0x68,0x7b,0x4a,0x63};   
-
 RF24 radio(NFR_CE, NFR_CSN); // NFR CE, CSN connections
 //NFR pin connections:
 //Pin   Pin Name            Mapped  Pin   Name       Connected To  On Device
@@ -97,8 +92,7 @@ typedef struct
 
 typedef struct
 {
-//  uint16_t controller1;
-//  uint16_t controller2;
+  bool updateEeprom;
   uint16_t controller3;
   OSLLight lights[12];
 } OSLLightPacket;
@@ -109,16 +103,6 @@ volatile OSLLightPacket packet;
 Servo servoFront;   
 // rear servo (2 axles)
 Servo servoRear;    
-//Servo pin connections:
-//Arduino
-//Pin   Pin Name        Mapped  Pin   Name      Connected To  On Device
-//                      Digital pin 6           Signal (Orange)  Servo
-//                      Digital pin 7           Signal (Orange)  Servo
-//                      GND                     Ground  (Brown)   Servo
-//                                              PWR     (Red)     Servo
-
-//const int servoMinPulse = 1200;
-//const int servoMaxPulse = 1800;
 
 void setup()
 {
@@ -140,21 +124,32 @@ void setup()
   servoFront.attach(SERVO_VOOR_PIN);  
   // second steering servo at the front
   servoRear.attach(SERVO_ACHTER_PIN); 
-  
+
+  long Temp;
+  // Get EEPROM Initialization value
+  Serial.println("eeprom initial read");
+  eeprom_read(Temp, E_InitNum);
+
+  // If EEPROM has never been initialized before, do so now
+  if (Temp == EEPROM_Init)
+  {
+    Serial.println("eeprom not initialized");
+    Initialize_EEPROM();
+  }
+  else
+  {
+    Serial.println("load eeprom");
+    Load_EEPROM();         
+  }
+
   updateServoPositions(1500);
 
   radio.begin();
-  radio.setPALevel(RF24_PA_HIGH); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
-  radio.setDataRate(RF24_1MBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS  
+  radio.setPALevel(RF24_PA_MIN); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
+  radio.setDataRate(RF24_250KBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS  
   radio.openReadingPipe(0, address);
   radio.startListening();
 }
-
-
-
-// ====================================================================================================================================================>
-//  MAIN LOOP
-// ====================================================================================================================================================>
 
 void loop()
 {
@@ -168,6 +163,7 @@ void loop()
   timer.run();
   
   receiveControllerInfo();
+
 } 
 
 
