@@ -25,7 +25,9 @@ int maxValueMeasuredForPot;
 //NFR 
 const byte NFR_CE  = 3;                      // NFR CE pin D3/pin7
 const byte NFR_CSN = 4;                      // NFR CSN pin D4/pin1
-const byte address[6] = {0x66,0x68,0x7b,0x4a,0x63}; //transmission address for NFR module
+const byte address[6] = {0x66,0x68,0x9b,0x4a,0x63}; //transmission address for NFR module
+//0x7b - RH
+//0x9b - mitja
 
 /* NFR wiring
  * VCC - 3.3v!!!!
