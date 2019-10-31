@@ -36,7 +36,7 @@ typedef struct
   OSLLight lights[12];
 } OSLLightPacket;
 
-volatile OSLLightPacket packet;
+OSLLightPacket packet;
 
 void setup()
 {
