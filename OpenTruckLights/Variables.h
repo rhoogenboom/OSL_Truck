@@ -3,7 +3,7 @@ bool setupActive = false; //defines whether we are in setup mode or not
 int buttonState = 0; //state of setupbutton default is open
 
 // EEPROM
-const long EEPROM_Init = 0xA03; // Change this any time the EEPROM content changes
+const long EEPROM_Init = 0xA04; // Change this any time the EEPROM content changes
 
 struct __eeprom_data { //  structure that maps all of the data we are storing in EEPROM
   long E_InitNum;      // Number that indicates if EEPROM values have ever been initialized
