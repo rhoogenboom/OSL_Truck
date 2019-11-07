@@ -42,7 +42,7 @@ void setup()
 {
   Serial.begin(BaudRate);  
     
-  //Initialize_EEPROM();
+  Initialize_EEPROM();
 
   // initialize setup button
   buttonState = 0;
@@ -67,15 +67,6 @@ void setup()
     Serial.println("load eeprom");
     Load_EEPROM();         
   }
-
-
-  if (INTERUPT_IO) { 
-    // Hook up interrupt handler functions for when data comes in
-    attachInterrupt(digitalPinToInterrupt(MixSteeringChannel_Pin), calcMixSteeringChannel, CHANGE);
-  } else {
-      pinMode(MixSteeringChannel_Pin, INPUT_PULLUP);
-  }
-       
   pinMode(PotMeter_Pin, INPUT); 
 
   //setup default controller values
@@ -101,11 +92,17 @@ void setup()
   else {
     Serial.println("Normal operating mode active");
     LightMode();
+    if (INTERUPT_IO) { 
+      // Hook up interrupt handler functions for when data comes in
+      attachInterrupt(digitalPinToInterrupt(MixSteeringChannel_Pin), calcMixSteeringChannel, CHANGE);
+    } else {
+        pinMode(MixSteeringChannel_Pin, INPUT_PULLUP);
+    }
   }
 
   //WIFI
   radio.begin();
-  radio.setPALevel(RF24_PA_MIN); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
+  radio.setPALevel(RF24_PA_LOW); //RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR
   radio.setDataRate(RF24_250KBPS); //RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS
   radio.openWritingPipe(address);
   radio.stopListening();

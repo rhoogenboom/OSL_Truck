@@ -6,12 +6,17 @@ void GetRxCommands()
 int GetMixedSteeringInput()
 {
     int MixedTurnPulse;
-    
-    //read the input from the RC receiver overruling the 5th wheel position
-    if (INTERUPT_IO) {
-      MixedTurnPulse = pulse_time;
+
+    //If setup is active we cannot red from the receiver, assume middle and continue
+    if (setupActive == true) {
+      MixedTurnPulse = 1500;
     } else {
-      MixedTurnPulse = pulseIn(MixSteeringChannel_Pin, HIGH, ServoTimeout);
+      //read the input from the RC receiver overruling the 5th wheel position
+      if (INTERUPT_IO) {
+        MixedTurnPulse = pulse_time;
+      } else {
+        MixedTurnPulse = pulseIn(MixSteeringChannel_Pin, HIGH, ServoTimeout);
+      }
     }
     
     //update the controller object for sending the data over

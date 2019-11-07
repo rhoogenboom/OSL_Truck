@@ -3,11 +3,11 @@
 #define DEBUG_OUTPUT false         
 
 //ms transmission interval
-#define transmissionInterval 100  
+#define transmissionInterval 50  
 
 // Set baud rate here if you know what you're doing and don't like the default value
 #define BaudRate 9600
 
 // Use interupts for IO
-#define INTERUPT_IO true
+#define INTERUPT_IO false
 
