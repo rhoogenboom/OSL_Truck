@@ -16,7 +16,13 @@ void ReadPotMeters() {
   //read magnet pot 
   int potInput = analogRead(MAGNET_POT); //input: 0-1024 
   Serial.print("Magnet input: "); Serial.println(potInput);
-  
+
+  int magnetSensor = analogRead(PotMeter_Pin);
+  // figure out the real middle of the magnet position to compensate based on what the magnet readout is saying the middle is
+  potMeterMiddleAdjustment = potMiddlePosition - magnetSensor;
+  Serial.print("magnetSensor input: "); Serial.println(magnetSensor);
+  Serial.print("potMeterMiddleAdjustment: "); Serial.println(potMeterMiddleAdjustment);
+    
   //adjust magnet min and max
   minValueMeasuredForPot = potInput;
   maxValueMeasuredForPot = potMiddlePosition + (potMiddlePosition - minValueMeasuredForPot); //maximal range potmeter movement right
@@ -53,7 +59,6 @@ void SetMagnetLEDs(int potInput) {
     output = map(potInput, 0, HALL_CENTER, 255, 0);    
     analogWrite(MAGNET_RIGHT_LED_GREEN, output);
   }
-  
 }
 
 

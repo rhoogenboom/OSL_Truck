@@ -42,8 +42,6 @@ void setup()
 {
   Serial.begin(BaudRate);  
     
-  Initialize_EEPROM();
-
   // initialize setup button
   buttonState = 0;
   pinMode(SETUP_BUTTON, INPUT);

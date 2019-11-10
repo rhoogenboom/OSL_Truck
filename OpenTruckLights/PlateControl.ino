@@ -45,9 +45,33 @@ int mixPlateAndReceiverInput(int receiver, int potmeter) {
   }
 }
 
+// takes the adjusted offset stored which corrects the middle of the magnet to the middle of the potmeter position
+int ConvertPotmeterToMiddlePosition(int potMeterInput) {
+  int convertedInput = potMeterInput + potMeterMiddleAdjustment;
+
+  //if real middle is a lower value than 512 compensate on the over 1024 area
+  if (potMeterMiddleAdjustment > 0) {
+    // figure out if we need compensating calculation as we might have gone beyond the 1024
+    if ( potMeterInput > (1024 - potMeterMiddleAdjustment) ) {
+      // compensate as we went over the end of the sensor so need to work back to 1 to x value
+      convertedInput = (potMeterInput + potMeterMiddleAdjustment) - 1024;
+    }
+  } else {
+    //if real middle is a higher value than 512 compensate on the smaller than 0 area
+    if ( potMeterInput <= abs(potMeterMiddleAdjustment) ) {
+      // compensate as we went over the end of the sensor so need to work back to 1 to x value
+      convertedInput = (1024 + potMeterMiddleAdjustment) + potMeterInput;
+    }
+  }
+  return convertedInput;
+}
+
+
 int CalculateRearAxlePosition(int receiver) {
   // reads the value of the potentiometer
-  potInput = analogRead(PotMeter_Pin); //input: 0-1024 
+  // run the value through a conversion because the magnet might just be a little bit off center
+  //potInput = analogRead(PotMeter_Pin); //input: 0-1024 
+  potInput = ConvertPotmeterToMiddlePosition(analogRead(PotMeter_Pin)); //input: 0-1024 
 
   int limitedPotmeterInput = limitToMaxPositionsFromPotmeter(potInput); //input range: 0-1023 limit: min and max for potmeter
   
@@ -58,8 +82,10 @@ int CalculateRearAxlePosition(int receiver) {
   
   //mix the receiver and the pot together but only when the sticks are out of center
   int resultingSteering = mixPlateAndReceiverInput(analogReceiverInput, analogPotmeterInput); //input: 875-2125 / 875-2125; 
-
-  if (DEBUG_INPUT) {
+  debugCounter++;
+  
+  if (DEBUG_INPUT && ((debugCounter % 20) == 0)) {
+    debugCounter=0;
     Serial.print(F("Min pot value - Max pot value : "));
     Serial.print(minValueMeasuredForPot); Serial.print(F(" - ")); Serial.println(maxValueMeasuredForPot);
     
@@ -85,7 +111,6 @@ int CalculateRearAxlePosition(int receiver) {
     Serial.print(resultingSteering); 
     Serial.print(F("               "));
     Serial.println(map(resultingSteering, MIN_CHANNEL, MAX_CHANNEL, servoMinPulse, servoMaxPulse)); 
-    delay(1000);
   }
   return map(resultingSteering, MIN_CHANNEL, MAX_CHANNEL, servoMinPulse, servoMaxPulse);
 }

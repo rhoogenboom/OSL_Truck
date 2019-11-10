@@ -3,16 +3,19 @@ bool setupActive = false; //defines whether we are in setup mode or not
 int buttonState = 0; //state of setupbutton default is open
 
 // EEPROM
-const long EEPROM_Init = 0xA04; // Change this any time the EEPROM content changes
+// Change this any time the EEPROM content changes
+//const long EEPROM_Init = 0xA04; //version used for 2x nano connection
+const long EEPROM_Init = 0xA05; //introduced new variable: potMeterMiddleAdjustment
 
 struct __eeprom_data { //  structure that maps all of the data we are storing in EEPROM
   long E_InitNum;      // Number that indicates if EEPROM values have ever been initialized
   int E_servoMinPulse;
   int E_minValueMeasuredForPot;
+  int E_potMeterMiddleAdjustment;
 };
 
 int potInput; //hold value of analoginput of hal sensor
-int potMiddlePosition = 514; //overruled the middle position of maxValueMeasuredForPot divided by two 2 due to the magnetic center
+int potMiddlePosition = 512; //overruled the middle position of maxValueMeasuredForPot divided by two 2 due to the magnetic center
 
 //servo and steering variables
 //Limit the steering servos to these maximum values for left and right
@@ -21,6 +24,8 @@ int servoMaxPulse; //position should be stored in trailer EEPROM also
 //adjustable min and max range for the pot/hal sensor
 int minValueMeasuredForPot;
 int maxValueMeasuredForPot;
+
+int potMeterMiddleAdjustment;
 
 //NFR 
 const byte NFR_CE  = 3;                      // NFR CE pin D3/pin7
@@ -47,4 +52,5 @@ boolean Startup =  true; //defines whether we are running the main loop for the 
 volatile int pulse_time;  
 volatile unsigned long receiver_pulse_start;                     
              
-
+//debug
+int debugCounter = 0;
