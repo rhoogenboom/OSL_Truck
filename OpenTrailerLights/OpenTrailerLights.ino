@@ -127,11 +127,11 @@ void setup()
 
   long Temp;
   // Get EEPROM Initialization value
-  Serial.println("eeprom initial read");
+  Serial.println("reading eeprom");
   eeprom_read(Temp, E_InitNum);
 
   // If EEPROM has never been initialized before, do so now
-  if (Temp == EEPROM_Init)
+  if (Temp != EEPROM_Init)
   {
     Serial.println("eeprom not initialized");
     Initialize_EEPROM();
